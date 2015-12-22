@@ -41,6 +41,12 @@ typedef struct block_dev_desc {
 	void		*priv;		/* driver private struct pointer */
 }block_dev_desc_t;
 
+struct block_drvr {
+	char *name;
+	block_dev_desc_t* (*get_dev)(int dev);
+	int (*select_hwpart)(int dev_num, int hwpart);
+};
+
 #define BLOCK_CNT(size, block_dev_desc) (PAD_COUNT(size, block_dev_desc->blksz))
 #define PAD_TO_BLOCKSIZE(size, block_dev_desc) \
 	(PAD_SIZE(size, block_dev_desc->blksz))
@@ -122,6 +128,8 @@ int get_device(const char *ifname, const char *dev_str,
 int get_device_and_partition(const char *ifname, const char *dev_part_str,
 			     block_dev_desc_t **dev_desc,
 			     disk_partition_t *info, int allow_whole_dev);
+
+extern const struct block_drvr block_drvr[];
 #else
 static inline block_dev_desc_t *get_dev(const char *ifname, int dev)
 { return NULL; }
