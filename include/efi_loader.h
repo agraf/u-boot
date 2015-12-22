@@ -63,6 +63,7 @@ struct efi_object {
 };
 extern struct list_head efi_obj_list;
 
+int efi_disk_register(void);
 efi_status_t efi_return_handle(void *handle,
 		efi_guid_t *protocol, void **protocol_interface,
 		void *agent_handle, void *controller_handle,
