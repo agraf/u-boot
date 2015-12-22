@@ -26,6 +26,31 @@ struct block_drvr {
 	int (*select_hwpart)(int dev_num, int hwpart);
 };
 
+const char *available_block_drvrs[] = {
+#if defined(CONFIG_CMD_IDE)
+	"ide",
+#endif
+#if defined(CONFIG_CMD_SATA)
+	"sata",
+#endif
+#if defined(CONFIG_CMD_SCSI)
+	"scsi",
+#endif
+#if defined(CONFIG_CMD_USB) && defined(CONFIG_USB_STORAGE)
+	"usb",
+#endif
+#if defined(CONFIG_MMC)
+	"mmc",
+#endif
+#if defined(CONFIG_SYSTEMACE)
+	"ace",
+#endif
+#if defined(CONFIG_SANDBOX)
+	"host",
+#endif
+	NULL,
+};
+
 static const struct block_drvr block_drvr[] = {
 #if defined(CONFIG_CMD_IDE)
 	{ .name = "ide", .get_dev = ide_get_dev, },
