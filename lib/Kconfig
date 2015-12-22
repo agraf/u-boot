@@ -129,5 +129,6 @@ config ERRNO_STR
 	  - if errno is negative - a pointer to errno related message
 
 source lib/efi/Kconfig
+source lib/efi_loader/Kconfig
 
 endmenu
