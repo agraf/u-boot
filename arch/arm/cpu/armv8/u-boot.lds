@@ -42,6 +42,14 @@ SECTIONS
 
 	. = ALIGN(8);
 
+	.efi_runtime : {
+                __efi_runtime_start = .;
+		*(efi_runtime)
+                __efi_runtime_stop = .;
+	}
+
+	. = ALIGN(8);
+
 	.image_copy_end :
 	{
 		*(.__image_copy_end)

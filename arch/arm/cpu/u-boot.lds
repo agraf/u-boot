@@ -89,6 +89,19 @@ SECTIONS
 
 	. = ALIGN(4);
 
+	.__efi_runtime_start : {
+		*(.__efi_runtime_start)
+	}
+
+	.efi_runtime : {
+		*(efi_runtime)
+	}
+
+	.__efi_runtime_stop : {
+		*(.__efi_runtime_stop)
+	}
+	. = ALIGN(4);
+
 	.image_copy_end :
 	{
 		*(.__image_copy_end)

@@ -39,6 +39,7 @@
 
 #define EFI_EXIT(ret) efi_exit_func(ret);
 
+extern const struct efi_runtime_services efi_runtime_services;
 extern struct efi_system_table systab;
 
 extern const struct efi_simple_text_output_protocol efi_con_out;
@@ -48,6 +49,8 @@ extern const struct efi_console_control_protocol efi_console_control;
 extern const efi_guid_t efi_guid_console_control;
 extern const efi_guid_t efi_guid_device_path;
 extern const efi_guid_t efi_guid_loaded_image;
+
+extern unsigned int __efi_runtime_start, __efi_runtime_stop;
 
 struct efi_class_map {
 	const efi_guid_t *guid;
