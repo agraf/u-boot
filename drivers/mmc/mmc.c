@@ -303,7 +303,7 @@ static int mmc_go_idle(struct mmc *mmc)
 
 static int sd_send_op_cond(struct mmc *mmc)
 {
-	int timeout = 1000;
+	int timeout = 2;
 	int err;
 	struct mmc_cmd cmd;
 
