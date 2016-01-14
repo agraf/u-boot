@@ -42,6 +42,9 @@ else ifdef CONFIG_ARM64
 obj-y	+= ccn504.o
 obj-y	+= gic_64.o
 obj-y	+= interrupts_64.o
+ifeq ($(CONFIG_SYS_DCACHE_OFF),y)
+obj-$(CONFIG_EFI_LOADER)	+= unaligned_64.o
+endif
 else
 obj-y	+= interrupts.o
 endif

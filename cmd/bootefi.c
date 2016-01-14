@@ -108,6 +108,11 @@ static unsigned long do_bootefi_exec(void *efi)
 		systab.nr_tables = 0;
 	}
 
+#ifdef CONFIG_SYS_DCACHE_OFF
+	printf("WARNING: You're running with MMU disabled, expect crashes\n"
+	       "         and send bug reports to your firmware vendor!\n");
+#endif
+
 	/* Load the EFI payload */
 	entry = efi_load_pe(efi, &loaded_image_info);
 	if (!entry)

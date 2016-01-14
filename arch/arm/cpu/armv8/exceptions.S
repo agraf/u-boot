@@ -144,3 +144,13 @@ exception_exit:
 	ldp	x27, x28, [sp],#16
 	ldp	x29, x30, [sp],#16
 	eret
+
+.global read_far
+read_far:
+	switch_el x1, 3f, 2f, 1f
+3:	mrs	x0, far_el3
+	ret
+2:	mrs	x0, far_el2
+	ret
+1:	mrs	x0, far_el1
+	ret

@@ -81,12 +81,31 @@ void do_bad_error(struct pt_regs *pt_regs, unsigned int esr)
 	panic("Resetting CPU ...\n");
 }
 
+#if defined(CONFIG_EFI_LOADER) && defined(CONFIG_SYS_DCACHE_OFF)
+int do_unaligned_data(struct pt_regs *pt_regs, unsigned int esr);
+#else
+static int do_unaligned_data(struct pt_regs *pt_regs, unsigned int esr)
+{
+	return -1;
+}
+#endif
+
 /*
  * do_sync handles the Synchronous Abort exception.
  */
 void do_sync(struct pt_regs *pt_regs, unsigned int esr)
 {
 	efi_restore_gd();
+
+	/*
+	 * EFI guarantees that unaligned accesses do succeed, so while we
+	 * still need hardware access and thus are unsure whether we can
+	 * enable the dcache to have the CPU deal with them, we fix unaligned
+	 * accesses up ourselves.
+	 */
+	if (!do_unaligned_data(pt_regs, esr))
+		return;
+
 	printf("\"Synchronous Abort\" handler, esr 0x%08x\n", esr);
 	show_regs(pt_regs);
 	panic("Resetting CPU ...\n");
