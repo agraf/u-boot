@@ -98,6 +98,8 @@ static void efi_restore_tpl(unsigned long old_tpl)
 static void *efi_alloc(uint64_t len, int memory_type)
 {
 	switch (memory_type) {
+	case EFI_LOADER_DATA:
+		return efi_loader_alloc(len);
 	default:
 		return malloc(len);
 	}
@@ -143,16 +145,109 @@ static efi_status_t efi_free_pages(uint64_t memory, unsigned long pages)
 	return EFI_EXIT(EFI_SUCCESS);
 }
 
-/* Will be implemented in a later patch */
+/*
+ * Returns the EFI memory map. In our case, this looks pretty simple:
+ *
+ *  ____________________________    TOM
+ * |                            |
+ * |    Second half of U-Boot   |
+ * |____________________________|   &__efi_runtime_stop
+ * |                            |
+ * |    EFI Runtime Services    |
+ * |____________________________|   &__efi_runtime_start
+ * |                            |
+ * |    First half of U-Boot    |
+ * |____________________________|   start of EFI loader allocation space
+ * |                            |
+ * |          Free RAM          |
+ * |____________________________|   CONFIG_SYS_SDRAM_BASE
+ *
+ * All pointers are extended to live on a 4k boundary. After exiting the boot
+ * services, only the EFI Runtime Services chunk of memory stays alive.
+ */
 static efi_status_t efi_get_memory_map(unsigned long *memory_map_size,
 			       struct efi_mem_desc *memory_map,
 			       unsigned long *map_key,
 			       unsigned long *descriptor_size,
 			       uint32_t *descriptor_version)
 {
+	struct efi_mem_desc efi_memory_map[] = {
+		{
+			/* RAM before U-Boot */
+			.type = EFI_CONVENTIONAL_MEMORY,
+			.attribute = 1 << EFI_MEMORY_WB_SHIFT,
+		},
+		{
+			/* First half of U-Boot */
+			.type = EFI_LOADER_DATA,
+			.attribute = 1 << EFI_MEMORY_WB_SHIFT,
+		},
+		{
+			/* EFI Runtime Services */
+			.type = EFI_RUNTIME_SERVICES_CODE,
+			.attribute = (1 << EFI_MEMORY_WB_SHIFT) |
+				     (1ULL << EFI_MEMORY_RUNTIME_SHIFT),
+		},
+		{
+			/* Second half of U-Boot */
+			.type = EFI_LOADER_DATA,
+			.attribute = 1 << EFI_MEMORY_WB_SHIFT,
+		},
+	};
+	ulong runtime_start, runtime_end, runtime_len_pages, runtime_len;
+
 	EFI_ENTRY("%p, %p, %p, %p, %p", memory_map_size, memory_map, map_key,
 		  descriptor_size, descriptor_version);
-	return EFI_EXIT(EFI_UNSUPPORTED);
+
+	runtime_start = (ulong)&__efi_runtime_start & ~0xfffULL;
+	runtime_end = ((ulong)&__efi_runtime_stop + 0xfff) & ~0xfffULL;
+	runtime_len_pages = (runtime_end - runtime_start) >> 12;
+	runtime_len = runtime_len_pages << 12;
+
+	/* Fill in where normal RAM is (up to U-Boot's top of stack) */
+	efi_memory_map[0].num_pages = gd->start_addr_sp >> 12;
+#ifdef CONFIG_SYS_SDRAM_BASE
+	efi_memory_map[0].physical_start = CONFIG_SYS_SDRAM_BASE;
+	efi_memory_map[0].virtual_start = CONFIG_SYS_SDRAM_BASE;
+	efi_memory_map[0].num_pages -= CONFIG_SYS_SDRAM_BASE >> 12;
+#endif
+
+	/* Give us some space for the stack */
+	efi_memory_map[0].num_pages -= (16 * 1024 * 1024) >> 12;
+
+	/* Reserve the EFI loader pool */
+	efi_memory_map[0].num_pages -= EFI_LOADER_POOL_SIZE >> 12;
+
+	/* Cut out the runtime services */
+	efi_memory_map[2].physical_start = runtime_start;
+	efi_memory_map[2].virtual_start = efi_memory_map[2].physical_start;
+	efi_memory_map[2].num_pages = runtime_len_pages;
+
+	/* Allocate the rest to U-Boot */
+	efi_memory_map[1].physical_start = efi_memory_map[0].physical_start +
+					   (efi_memory_map[0].num_pages << 12);
+	efi_memory_map[1].virtual_start = efi_memory_map[1].physical_start;
+	efi_memory_map[1].num_pages = (runtime_start -
+				       efi_memory_map[1].physical_start) >> 12;
+
+	efi_memory_map[3].physical_start = runtime_start + runtime_len;
+	efi_memory_map[3].virtual_start = efi_memory_map[3].physical_start;
+	efi_memory_map[3].num_pages = (gd->ram_top -
+				       efi_memory_map[3].physical_start) >> 12;
+
+	*memory_map_size = sizeof(efi_memory_map);
+
+	if (descriptor_size)
+		*descriptor_size = sizeof(struct efi_mem_desc);
+
+	if (*memory_map_size < sizeof(efi_memory_map)) {
+		return EFI_EXIT(EFI_BUFFER_TOO_SMALL);
+	}
+
+	if (memory_map)
+		memcpy(memory_map, efi_memory_map, sizeof(efi_memory_map));
+
+	return EFI_EXIT(EFI_SUCCESS);
 }
 
 static efi_status_t efi_allocate_pool(int pool_type, unsigned long size, void **buffer)

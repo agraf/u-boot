@@ -29,10 +29,34 @@ efi_status_t efi_return_handle(void *handle, efi_guid_t *protocol,
 	return EFI_SUCCESS;
 }
 
-/* Will be implemented in a later patch */
+/*
+ * EFI payloads potentially want to load pretty big images into memory,
+ * so our small malloc region isn't enough for them. However, they usually
+ * don't need a smart allocator either.
+ *
+ * So instead give them a really dumb one. We just reserve EFI_LOADER_POOL_SIZE
+ * bytes from 16MB below the stack start to give the stack some space.
+ * Then every allocation gets a 4k aligned chunk from it. We never free.
+ */
 void *efi_loader_alloc(uint64_t len)
 {
-	return NULL;
+	static unsigned long loader_pool;
+	void *r;
+
+	if (!loader_pool) {
+		loader_pool = ((gd->start_addr_sp >> 12) << 12) -
+			      (16 * MB) - EFI_LOADER_POOL_SIZE;
+	}
+
+	len = ROUND_UP(len, 4096);
+	/* Out of memory */
+	if ((loader_pool + len) >= (gd->relocaddr - TOTAL_MALLOC_LEN))
+		return NULL;
+
+	r = (void *)loader_pool;
+	loader_pool += len;
+
+	return r;
 }
 
 /*
