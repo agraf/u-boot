@@ -20,7 +20,8 @@
 #ifndef CONFIG_SYS_FULL_VA
 #define PGTABLE_SIZE	(0x10000)
 #else
-#define PGTABLE_SIZE	CONFIG_SYS_PGTABLE_SIZE
+u64 get_page_table_size(void);
+#define PGTABLE_SIZE	get_page_table_size()
 #endif
 
 /* 2MB granularity */
