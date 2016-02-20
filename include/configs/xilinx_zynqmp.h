@@ -29,6 +29,50 @@
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		CONFIG_SYS_SDRAM_SIZE
 
+#define CONFIG_SYS_FULL_VA
+#define CONFIG_SYS_MEM_MAP {						\
+	{								\
+		.base = 0x0UL,						\
+		.size = 0x80000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |			\
+			 PTE_BLOCK_INNER_SHARE				\
+	}, {								\
+		.base = 0x80000000UL,					\
+		.size = 0x70000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |		\
+			 PTE_BLOCK_NON_SHARE |				\
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN			\
+	}, {								\
+		.base = 0xf8000000UL,					\
+		.size = 0x07e00000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |		\
+			 PTE_BLOCK_NON_SHARE |				\
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN			\
+	}, {								\
+		.base = 0xffe00000UL,					\
+		.size = 0x00200000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |			\
+			 PTE_BLOCK_INNER_SHARE				\
+	}, {								\
+		.base = 0x400000000UL,					\
+		.size = 0x200000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |		\
+			 PTE_BLOCK_NON_SHARE |				\
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN			\
+	}, {								\
+		.base = 0x600000000UL,					\
+		.size = 0x800000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |			\
+			 PTE_BLOCK_INNER_SHARE				\
+	}, {								\
+		.base = 0xe00000000UL,					\
+		.size = 0xf200000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |		\
+			 PTE_BLOCK_NON_SHARE |				\
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN			\
+	},								\
+	}
+
 /* Have release address at the end of 256MB for now */
 #define CPU_RELEASE_ADDR	0xFFFFFF0
 
