@@ -17,12 +17,8 @@
 #define CR_WXN		(1 << 19)	/* Write Permision Imply XN	*/
 #define CR_EE		(1 << 25)	/* Exception (Big) Endian	*/
 
-#ifndef CONFIG_SYS_FULL_VA
-#define PGTABLE_SIZE	(0x10000)
-#else
 u64 get_page_table_size(void);
 #define PGTABLE_SIZE	get_page_table_size()
-#endif
 
 /* 2MB granularity */
 #define MMU_SECTION_SHIFT	21

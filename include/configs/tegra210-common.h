@@ -13,7 +13,6 @@
 /* Cortex-A57 uses a cache line size of 64 bytes */
 #define CONFIG_SYS_CACHELINE_SIZE	64
 
-#define CONFIG_SYS_FULL_VA
 #define CONFIG_SYS_MEM_MAP {						\
 	{								\
 		.base = 0x0UL,						\

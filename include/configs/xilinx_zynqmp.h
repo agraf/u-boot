@@ -29,7 +29,6 @@
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		CONFIG_SYS_SDRAM_SIZE
 
-#define CONFIG_SYS_FULL_VA
 #define CONFIG_SYS_MEM_MAP {						\
 	{								\
 		.base = 0x0UL,						\
