@@ -19,9 +19,23 @@
 
 #define CONFIG_SUPPORT_RAW_INITRD
 
-/* Cache Definitions */
-#define CONFIG_SYS_DCACHE_OFF
-#define CONFIG_SYS_ICACHE_OFF
+/* MMU Definitions */
+#define CONFIG_SYS_CACHELINE_SIZE	64
+#define CONFIG_SYS_FULL_VA
+#define CONFIG_SYS_MEM_MAP {						\
+	{								\
+		.base = 0x0UL,						\
+		.size = 0x80000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |		\
+			 PTE_BLOCK_NON_SHARE |				\
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN			\
+	}, {								\
+		.base = 0x80000000UL,					\
+		.size = 0xff80000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |			\
+			 PTE_BLOCK_INNER_SHARE				\
+	},								\
+	}
 
 #define CONFIG_IDENT_STRING		" vexpress_aemv8a"
 #define CONFIG_BOOTP_VCI_STRING		"U-Boot.armv8.vexpress_aemv8a"
