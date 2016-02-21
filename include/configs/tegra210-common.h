@@ -13,6 +13,22 @@
 /* Cortex-A57 uses a cache line size of 64 bytes */
 #define CONFIG_SYS_CACHELINE_SIZE	64
 
+#define CONFIG_SYS_FULL_VA
+#define CONFIG_SYS_MEM_MAP {						\
+	{								\
+		.base = 0x0UL,						\
+		.size = 0x80000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |		\
+			 PTE_BLOCK_NON_SHARE |				\
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN			\
+	}, {								\
+		.base = 0x80000000UL,					\
+		.size = 0xff80000000UL,					\
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |			\
+			 PTE_BLOCK_INNER_SHARE				\
+	},								\
+	}
+
 /*
  * NS16550 Configuration
  */
