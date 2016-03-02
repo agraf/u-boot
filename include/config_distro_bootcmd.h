@@ -106,15 +106,15 @@
 		"bootefi ${kernel_addr_r}\0"                              \
 	\
 	"load_efi_dtb="                                                   \
-		"load ${devtype} ${devnum}:${distro_bootpart} "           \
+		"load ${devtype} ${devnum}:2 "                            \
 			"${fdt_addr_r} ${prefix}${fdtfile}; "             \
 		"fdt addr ${fdt_addr_r}\0"                                \
 	\
-	"efi_dtb_prefixes=/ /dtb/ /dtb/current/\0"                        \
+	"efi_dtb_prefixes=/ /dtb/ /dtb/current/ /boot/ /boot/dtb/ /boot/dtb/current/\0" \
 	"scan_dev_for_efi="                                               \
 		"for prefix in ${efi_dtb_prefixes}; do "                  \
 			"if test -e ${devtype} "                          \
-					"${devnum}:${distro_bootpart} "   \
+					"${devnum}:2 "                    \
 					"${prefix}${fdtfile}; then "      \
 				"run load_efi_dtb; "                      \
 			"fi;"                                             \
