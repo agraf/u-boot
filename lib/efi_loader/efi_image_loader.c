@@ -73,6 +73,11 @@ static void efi_loader_relocate(const IMAGE_BASE_RELOCATION *rel,
 	}
 }
 
+void __weak invalidate_icache_all(void)
+{
+	/* If the system doesn't support icache_all flush, cross our fingers */
+}
+
 /*
  * This function loads all sections from a PE binary into a newly reserved
  * piece of memory. On successful load it then returns the entry point for
