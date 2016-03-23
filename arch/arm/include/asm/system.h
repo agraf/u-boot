@@ -88,6 +88,12 @@ static inline unsigned long read_mpidr(void)
 
 #define BSP_COREID	0
 
+static inline void sdelay(unsigned long n)
+{
+	int i;
+	for (i = 0; i < n; i++) asm volatile("");
+}
+
 void __asm_flush_dcache_all(void);
 void __asm_invalidate_dcache_all(void);
 void __asm_flush_dcache_range(u64 start, u64 end);

@@ -19,3 +19,4 @@ obj-y	+= fwcall.o
 obj-$(CONFIG_FSL_LAYERSCAPE) += fsl-layerscape/
 obj-$(CONFIG_ARCH_ZYNQMP) += zynqmp/
 obj-$(CONFIG_TARGET_HIKEY) += hisilicon/
+obj-$(CONFIG_ARCH_SUNXI) += ../armv7/sunxi/

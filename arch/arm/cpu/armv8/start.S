@@ -19,6 +19,28 @@
 
 .globl	_start
 _start:
+
+#if 1 /* XXX Remove me when booting with ATF in proper 64bit mode */
+	/*
+	 * On some systems we come up in EL3 in AArch32 mode. To be able to run
+	 * our AArch64 SPL code, we need to first switch the CPU into AArch64
+	 * mode using RMR.
+	 */
+	.long 0xe3a01617 /* mov	r1, #0x1700000	@ CPUCFG MMIO block base addr */
+	.long 0xe38110a0 /* orr	r1, r1, #0xA0	@ offset of RVBAR_0_L         */
+	.long 0xe59f0020 /* ldr	r0, [pc, #32]	@ reset pointer location      */
+	.long 0xe5810000 /* str	r0, [r1]                                      */
+	.long 0xf57ff04f /* dsb	sy                                            */
+	.long 0xf57ff06f /* isb	sy              @ make sure we write the addr */
+	.long 0xee1c0f50 /* mrc	15, 0, r0, cr12, cr0, {2} @ read RMR          */
+	.long 0xe3800003 /* orr	r0, r0, #3      @ warm reset into AArch64     */
+	.long 0xee0c0f50 /* mcr	15, 0, r0, cr12, cr0, {2} @ trigger reset     */
+	.long 0xf57ff06f /* isb	sy                                            */
+	.long 0xe320f003 /* wfi                                               */
+	.long 0xeafffffd /* b	.-4             @ loop to wfi                 */
+	.long reset	 /* Address we jump to in AArch64 mode                */
+#endif
+
 	b	reset
 
 	.align 3
