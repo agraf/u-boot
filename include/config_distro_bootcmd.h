@@ -125,16 +125,16 @@
 		"fi\0"                                                    \
 	\
 	"load_efi_dtb="                                                   \
-		"load ${devtype} ${devnum}:${distro_bootpart} "           \
+		"load ${devtype} ${devnum}:2 "           \
 			"${fdt_addr_r} ${prefix}${efi_fdtfile}\0"         \
 	\
-	"efi_dtb_prefixes=/ /dtb/ /dtb/current/\0"                        \
+	"efi_dtb_prefixes=/ /dtb/ /dtb/current/ /boot/ /boot/dtb/ /boot/dtb/current/\0" \
 	"scan_dev_for_efi="                                               \
 		"setenv efi_fdtfile ${fdtfile}; "                         \
 		BOOTENV_EFI_SET_FDTFILE_FALLBACK                          \
 		"for prefix in ${efi_dtb_prefixes}; do "                  \
 			"if test -e ${devtype} "                          \
-					"${devnum}:${distro_bootpart} "   \
+					"${devnum}:2 "   \
 					"${prefix}${efi_fdtfile}; then "  \
 				"run load_efi_dtb; "                      \
 			"fi;"                                             \
