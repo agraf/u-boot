@@ -19,7 +19,7 @@ void *kmalloc(size_t size, int flags)
 	void *p;
 
 	p = memalign(ARCH_DMA_MINALIGN, size);
-	if (flags & __GFP_ZERO)
+	if (p)
 		memset(p, 0, size);
 
 	return p;

@@ -57,6 +57,9 @@
 		serial2 = &uart2;
 		serial3 = &uart3;
 		serial4 = &uart4;
+                disp = &disp;
+                hdmi = &hdmi;
+                boot_disp = &boot_disp;
 	};
 
 	cpus {
@@ -295,6 +298,69 @@
 					     "mmc2_output",
 					     "mmc2_sample";
 		};
+
+
+
+                clk_pll_video0: pll_video0 {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-pll-clock";
+                        lock-mode = "new";
+                        assigned-clock-rates = <297000000>;
+                        clock-output-names = "pll_video0";
+                };
+                clk_pll_de: pll_de {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-pll-clock";
+                        lock-mode = "new";
+                        assigned-clock-rates = <297000000>;
+                        clock-output-names = "pll_de";
+                };
+                clk_pll_mipi: pll_mipi {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-pll-clock";
+                        lock-mode = "new";
+                        clock-output-names = "pll_mipi";
+                };
+                clk_hdmi: hdmi {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        assigned-clock-parents = <&clk_pll_video0>;
+                        clock-output-names = "hdmi";
+                };
+                clk_hdmi_slow: hdmi_slow {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        clock-output-names = "hdmi_slow";
+                };
+                clk_de: de {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        assigned-clock-parents = <&clk_pll_de>;
+                        assigned-clock-rates = <297000000>;
+                        clock-output-names = "de";
+                };
+                clk_tcon0: tcon0 {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        assigned-clock-parents = <&clk_pll_mipi>;
+                        clock-output-names = "tcon0";
+                };
+                clk_tcon1: tcon1 {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        assigned-clock-parents = <&clk_pll_video0>;
+                        clock-output-names = "tcon1";
+                };
+                clk_mipidsi: mipidsi {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        clock-output-names = "mipidsi";
+                };
+                clk_lvds: lvds {
+                        #clock-cells = <0>;
+                        compatible = "allwinner,sunxi-periph-clock";
+                        clock-output-names = "lvds";
+                };
 	};
 
 	regulators {
@@ -546,6 +612,37 @@
 			interrupts = <GIC_SPI 40 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 41 IRQ_TYPE_LEVEL_HIGH>;
 		};
+
+                disp: disp@01000000 {
+                        compatible = "allwinner,sun50i-disp";
+                        reg = <0x0 0x01000000 0x0 0x00300000>,/*de*/
+                                <0x0 0x01c0c000 0x0 0x17fc>,/*lcd*/
+                                <0x0 0x01ca0000 0x0 0x10fc>;/*dsi*/
+                        interrupts = <GIC_SPI 86 0x0104>, <GIC_SPI 87 0x0104>,
+                                <GIC_SPI 89 0x0104>;/* for dsi */
+                        clocks = <&clk_de>,<&clk_tcon0>,
+                                <&clk_lvds>,<&clk_mipidsi>,<&clk_tcon1>;
+
+                        status = "okay";
+                };
+
+                soc_tr: tr@01000000 {
+                        compatible = "allwinner,sun50i-tr";
+                        reg = <0x0 0x01000000 0x0 0x000200bc>;
+                        interrupts = <GIC_SPI 96 0x0104>;
+                        clocks = <&clk_de>;
+                        status = "okay";
+                };
+
+                hdmi: hdmi@01ee0000 {
+                        compatible = "allwinner,sunxi-hdmi";
+                        reg = <0x0 0x01ee0000 0x0 0x20000>;
+                        clocks = <&clk_hdmi>,<&clk_hdmi_slow>;
+                };
+
+                boot_disp: boot_disp {
+                        compatible = "allwinner,boot_disp";
+                };
 	};
 
 	gic: interrupt-controller@{

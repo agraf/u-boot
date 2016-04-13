@@ -1,89 +1,121 @@
 /*
- * (C) Copyright 2007-2011
+ * (C) Copyright 2007-2013
  * Allwinner Technology Co., Ltd. <www.allwinnertech.com>
- * Tom Cubie <tangliang@allwinnertech.com>
+ * Jerry Wang <wangflord@allwinnertech.com>
  *
- * Configuration settings for the Allwinner A10-evb board.
+ * See file CREDITS for list of people who contributed to this
+ * project.
  *
- * SPDX-License-Identifier:	GPL-2.0+
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
  */
 
 #ifndef _SUNXI_TIMER_H_
 #define _SUNXI_TIMER_H_
 
-#ifndef __ASSEMBLY__
-
-#include <linux/types.h>
+#include <asm/arch/platform.h>
 #include <asm/arch/watchdog.h>
-
 /* General purpose timer */
 struct sunxi_timer {
-	u32 ctl;
-	u32 inter;
-	u32 val;
-	u8 res[4];
+	volatile u32 ctl;
+	volatile u32 inter;
+	volatile u32 val;
+	uint  	 res[1];
 };
 
 /* Audio video sync*/
 struct sunxi_avs {
-	u32 ctl;		/* 0x80 */
-	u32 cnt0;		/* 0x84 */
-	u32 cnt1;		/* 0x88 */
-	u32 div;		/* 0x8c */
+	volatile u32 ctl;		/* 0x80 */
+	volatile u32 cnt0;		/* 0x84 */
+	volatile u32 cnt1;		/* 0x88 */
+	volatile u32 div;		/* 0x8c */
 };
 
 /* 64 bit counter */
 struct sunxi_64cnt {
-	u32 ctl;		/* 0xa0 */
-	u32 lo;			/* 0xa4 */
-	u32 hi;			/* 0xa8 */
+	volatile u32 ctl;		/* 0xa0 */
+	volatile u32 lo;			/* 0xa4 */
+	volatile u32 hi;			/* 0xa8 */
 };
 
-/* Rtc */
-struct sunxi_rtc {
-	u32 ctl;		/* 0x100 */
-	u32 yymmdd;		/* 0x104 */
-	u32 hhmmss;		/* 0x108 */
+/* Watchdog */
+#if 0
+struct sunxi_wdog {
+	volatile u32 irq_enable;		/* 0xa0 */
+	volatile u32 irq_status;		/* 0xa4 */
+	volatile u32 res0[2];
+	volatile u32 ctrl;
+	volatile u32 cfg;
+	volatile u32 mode;
+	volatile u32 res1[1];
 };
+#endif
 
 /* Alarm */
 struct sunxi_alarm {
-	u32 ddhhmmss;		/* 0x10c */
-	u32 hhmmss;		/* 0x110 */
-	u32 en;			/* 0x114 */
-	u32 irqen;		/* 0x118 */
-	u32 irqsta;		/* 0x11c */
+	volatile u32 ddhhmmss;	/* 0x10c */
+	volatile u32 hhmmss;		/* 0x110 */
+	volatile u32 en;			/* 0x114 */
+	volatile u32 irqen;		/* 0x118 */
+	volatile u32 irqsta;		/* 0x11c */
 };
 
-/* Timer general purpose register */
-struct sunxi_tgp {
-	u32 tgpd;
-};
 
 struct sunxi_timer_reg {
-	u32 tirqen;		/* 0x00 */
-	u32 tirqsta;		/* 0x04 */
-	u8 res1[8];
+	volatile u32 tirqen;		/* 0x00 */
+	volatile u32 tirqsta;	/* 0x04 */
+	uint     res1[2];
 	struct sunxi_timer timer[6];	/* We have 6 timers */
-	u8 res2[16];
+	uint  	 res2[4];
 	struct sunxi_avs avs;
-#ifdef CONFIG_SUNXI_GEN_SUN4I
-	struct sunxi_wdog wdog;	/* 0x90 */
-	/* XXX the following is not accurate for sun5i/sun7i */
-	struct sunxi_64cnt cnt64;	/* 0xa0 */
-	u8 res4[0x58];
-	struct sunxi_rtc rtc;
-	struct sunxi_alarm alarm;
-	struct sunxi_tgp tgp[4];
-	u8 res5[8];
-	u32 cpu_cfg;
-#endif
-#ifdef CONFIG_SUNXI_GEN_SUN6I
-	u8 res3[16];
-	struct sunxi_wdog wdog[5];	/* We have 5 watchdogs */
-#endif
+	uint     res3[4];
+	struct sunxi_wdog wdog[4];
 };
 
-#endif /* __ASSEMBLY__ */
+struct timer_list
+{
+	unsigned int expires;
+	void (*function)(void *data);
+	unsigned long data;
+	int   timer_num;
+};
+
+extern int  timer_init(void);
+
+extern void timer_exit(void);
+
+extern void watchdog_disable(void);
+
+extern void watchdog_enable(void);
+
+extern void init_timer(struct timer_list *timer);
+
+extern void add_timer(struct timer_list *timer);
+
+extern void del_timer(struct timer_list *timer);
+
+extern void __usdelay(unsigned long usec);
+
+extern void __msdelay(unsigned long msec);
+
+#define TMRC_INT_EN             (TIMER_BASE + 0x00)
+#define TMRC_INT_ST             (TIMER_BASE + 0x04)
+
+#define TMRC_CTRL(n)            (TIMER_BASE + 0x10 + 0x10 * (n) + 0x00)
+#define TMRC_INTV(n)            (TIMER_BASE + 0x10 + 0x10 * (n) + 0x04)
+#define TMRC_CURNT(n)           (TIMER_BASE + 0x10 + 0x10 * (n) + 0x08)
 
 #endif
+

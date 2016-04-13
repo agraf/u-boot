@@ -26,6 +26,7 @@
 #include <asm/arch/timer.h>
 #include <asm/arch/tzpc.h>
 #include <asm/arch/mmc.h>
+#include <asm/arch/watchdog.h>
 
 #include <linux/compiler.h>
 
