@@ -30,6 +30,11 @@
 #include <asm/armv7.h>
 #endif
 
+#ifdef CONFIG_FSL_MC_ENET
+#include <fsl-mc/fsl_mc.h>
+#include <fsl-mc/fsl_mc_private.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 static struct tag *params;
@@ -84,6 +89,12 @@ static void announce_and_cleanup(int fake)
 #ifdef CONFIG_USB_DEVICE
 	udc_disconnect();
 #endif
+
+#ifdef CONFIG_FSL_MC_ENET
+	if (!fsl_mc_ldpaa_exit(NULL))
+		mc_apply_dpl(0);
+#endif
+
 	cleanup_before_linux();
 }
 

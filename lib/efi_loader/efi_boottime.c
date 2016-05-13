@@ -16,6 +16,11 @@
 #include <inttypes.h>
 #include <watchdog.h>
 
+#ifdef CONFIG_FSL_MC_ENET
+#include <fsl-mc/fsl_mc.h>
+#include <fsl-mc/fsl_mc_private.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 /* This list contains all the EFI objects our payload has access to */
@@ -522,6 +527,11 @@ static efi_status_t EFIAPI efi_exit_boot_services(void *image_handle,
 						  unsigned long map_key)
 {
 	EFI_ENTRY("%p, %ld", image_handle, map_key);
+
+#ifdef CONFIG_FSL_MC_ENET
+	if (!fsl_mc_ldpaa_exit(NULL))
+		mc_apply_dpl(0);
+#endif
 
 	/* Fix up caches for EFI payloads if necessary */
 	efi_exit_caches();

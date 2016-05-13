@@ -127,7 +127,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 #ifdef CONFIG_FSL_MC_ENET
 	fdt_fixup_board_enet(blob);
-	fsl_mc_ldpaa_exit(bd);
 #endif
 
 	return 0;
