@@ -164,7 +164,9 @@ phys_size_t initdram(int board_type)
 #else
 	puts("Initializing DDR....using SPD\n");
 
+	dcache_disable();
 	dram_size = fsl_ddr_sdram();
+	set_sctlr(get_sctlr() | (CR_C|CR_M));
 #endif
 
 	return dram_size;
