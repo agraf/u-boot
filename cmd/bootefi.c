@@ -205,6 +205,17 @@ static unsigned long do_bootefi_exec(void *efi, void *fdt)
 		loaded_image_info.device_handle = nethandle;
 #endif
 
+#ifdef CONFIG_ARM64
+	/* On AArch64 we need to make sure we call our payload in < EL3 */
+	if (current_el() == 3) {
+		smp_kick_all_cpus();
+		dcache_disable();	/* flush cache before switch to EL2 */
+		armv8_switch_to_el2();
+		/* Enable caches again */
+		set_sctlr(get_sctlr() | (CR_C|CR_M));
+	}
+#endif
+
 	/* Call our payload! */
 	debug("%s:%d Jumping to 0x%lx\n", __func__, __LINE__, (long)entry);
 

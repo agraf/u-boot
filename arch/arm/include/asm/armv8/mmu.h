@@ -116,19 +116,24 @@
 static inline void set_ttbr_tcr_mair(int el, u64 table, u64 tcr, u64 attr)
 {
 	asm volatile("dsb sy");
-	if (el == 1) {
+	switch (el) {
+	case 1:
 		asm volatile("msr ttbr0_el1, %0" : : "r" (table) : "memory");
 		asm volatile("msr tcr_el1, %0" : : "r" (tcr) : "memory");
 		asm volatile("msr mair_el1, %0" : : "r" (attr) : "memory");
-	} else if (el == 2) {
-		asm volatile("msr ttbr0_el2, %0" : : "r" (table) : "memory");
-		asm volatile("msr tcr_el2, %0" : : "r" (tcr) : "memory");
-		asm volatile("msr mair_el2, %0" : : "r" (attr) : "memory");
-	} else if (el == 3) {
+		break;
+	case 3:
 		asm volatile("msr ttbr0_el3, %0" : : "r" (table) : "memory");
 		asm volatile("msr tcr_el3, %0" : : "r" (tcr) : "memory");
 		asm volatile("msr mair_el3, %0" : : "r" (attr) : "memory");
-	} else {
+
+		/* We may switch to EL2 later, so set those too; fall through */
+	case 2:
+		asm volatile("msr ttbr0_el2, %0" : : "r" (table) : "memory");
+		asm volatile("msr tcr_el2, %0" : : "r" (tcr) : "memory");
+		asm volatile("msr mair_el2, %0" : : "r" (attr) : "memory");
+		break;
+	default:
 		hang();
 	}
 	asm volatile("isb");
