@@ -136,8 +136,6 @@ int efi_gop_register(void)
 	gopobj->mode.max_mode = 1;
 	gopobj->mode.info = &gopobj->info;
 	gopobj->mode.info_size = sizeof(gopobj->info);
-	gopobj->mode.fb_base = gd->fb_base;
-	gopobj->mode.fb_size = lcd_get_size(&line_len);
 
 	gopobj->info.version = 0;
 	gopobj->info.width = panel_info.vl_col;
