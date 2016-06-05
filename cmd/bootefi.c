@@ -198,6 +198,10 @@ static unsigned long do_bootefi_exec(void *efi, void *fdt)
 	efi_gop_register();
 #endif
 
+	/* Initialize EFI runtime services */
+	efi_reset_system_init();
+	efi_get_time_init();
+
 	/* Call our payload! */
 #ifdef DEBUG_EFI
 	printf("%s:%d Jumping to 0x%lx\n", __func__, __LINE__, (long)entry);
