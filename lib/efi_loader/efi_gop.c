@@ -183,6 +183,16 @@ int efi_gop_register(void)
 	gopobj->mode.info = &gopobj->info;
 	gopobj->mode.info_size = sizeof(gopobj->info);
 
+#ifdef CONFIG_DM_VIDEO
+	if (bpix == VIDEO_BPP32) {
+#else
+	if (bpix == LCD_COLOR32) {
+#endif
+		/* With 32bit color space we can directly expose the fb */
+		gopobj->mode.fb_base = fb_base;
+		gopobj->mode.fb_size = fb_size;
+	}
+
 	gopobj->info.version = 0;
 	gopobj->info.width = col;
 	gopobj->info.height = row;
