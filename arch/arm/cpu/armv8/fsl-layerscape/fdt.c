@@ -75,7 +75,7 @@ void ft_fixup_cpu(void *blob)
 			*boot_code_size);
 #ifdef CONFIG_EFI_LOADER
 	efi_add_memory_map((uintptr_t)&secondary_boot_code,
-			   ALIGN(*boot_code_size, EFI_PAGE_SIZE),
+			   ALIGN(*boot_code_size, EFI_PAGE_SIZE) >> EFI_PAGE_SHIFT,
 			   EFI_RESERVED_MEMORY_TYPE, false);
 #endif
 }
