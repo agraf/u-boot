@@ -5,6 +5,7 @@
  */
 
 #include <common.h>
+#include <efi_loader.h>
 #include <libfdt.h>
 #include <fdt_support.h>
 #include <phy.h>
@@ -72,6 +73,11 @@ void ft_fixup_cpu(void *blob)
 
 	fdt_add_mem_rsv(blob, (uintptr_t)&secondary_boot_code,
 			*boot_code_size);
+#ifdef CONFIG_EFI_LOADER
+	efi_add_memory_map((uintptr_t)&secondary_boot_code,
+			   ALIGN(*boot_code_size, EFI_PAGE_SIZE),
+			   EFI_RESERVED_MEMORY_TYPE, false);
+#endif
 }
 #endif
 
