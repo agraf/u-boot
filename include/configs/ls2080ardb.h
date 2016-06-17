@@ -362,9 +362,7 @@ unsigned long get_board_sys_clk(void);
 #undef CONFIG_BOOTCOMMAND
 /* Try to boot an on-NOR kernel first, then do normal distro boot */
 #define CONFIG_BOOTCOMMAND "run mcinitcmd && fsl_mc lazyapply dpl 0x580700000" \
-			   " && cp.b $kernel_start $kernel_load $kernel_size" \
-			   " && bootm $kernel_load" \
-			   " || setenv ethact DPMAC5@xgmii" \
+			   " && setenv ethact e1000#0" \
 			   " && run distro_bootcmd"
 
 /* MAC/PHY configuration */
