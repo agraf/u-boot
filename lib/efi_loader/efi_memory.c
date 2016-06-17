@@ -474,5 +474,20 @@ int efi_memory_init(void)
 	efi_bounce_buffer = (void*)(uintptr_t)efi_bounce_buffer_addr;
 #endif
 
+#ifdef CONFIG_SYS_MEM_RESERVE_SECURE
+	/* Declare secure ram as reserved */
+        if (gd->arch.secure_ram & MEM_RESERVE_SECURE_SECURED) {
+		uint64_t secure_start = gd->arch.secure_ram;
+		uint64_t secure_pages = CONFIG_SYS_MEM_RESERVE_SECURE;
+
+		secure_start &= MEM_RESERVE_SECURE_ADDR_MASK;
+		secure_start &= ~EFI_PAGE_MASK;
+		secure_pages = (secure_pages + EFI_PAGE_MASK) >> EFI_PAGE_SHIFT;
+
+		efi_add_memory_map(secure_start, secure_pages,
+				   EFI_RESERVED_MEMORY_TYPE, false);
+        }
+#endif
+
 	return 0;
 }
