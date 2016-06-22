@@ -1096,6 +1096,7 @@ static int arasan_nand_init(struct nand_chip *nand_chip, int devnum)
 	struct arasan_nand_info *nand;
 	struct mtd_info *mtd;
 	int err = -1;
+if (1) return -1;
 
 	nand = calloc(1, sizeof(struct arasan_nand_info));
 	if (!nand) {
