@@ -41,11 +41,6 @@ void dram_init_banksize(void)
 	gd->bd->bi_dram[0].size = gd->ram_size - (16 * 1024 * 1024);
 }
 
-void reset_cpu(ulong addr)
-{
-	psci_system_reset();
-}
-
 static struct mm_region gxbb_mem_map[] = {
 	{
 		.virt = 0x0UL,
