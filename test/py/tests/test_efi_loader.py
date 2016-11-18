@@ -180,9 +180,11 @@ def test_efi_grub_net(u_boot_console):
     u_boot_console.run_command('bootefi %x' % addr, wait_for_prompt=False)
 
     # Verify that we have an SMBIOS table
-    u_boot_console.wait_for('grub>')
-    output = u_boot_console.run_command('lsefisystab', wait_for_prompt=False, wait_for_echo=False)
-    u_boot_console.wait_for('SMBIOS')
+    check_smbios = u_boot_console.config.env.get('env__efi_loader_check_smbios', False)
+    if check_smbios:
+        u_boot_console.wait_for('grub>')
+        output = u_boot_console.run_command('lsefisystab', wait_for_prompt=False, wait_for_echo=False)
+        u_boot_console.wait_for('SMBIOS')
 
     # Then exit cleanly
     u_boot_console.wait_for('grub>')
