@@ -94,8 +94,8 @@ script:
  # "-k something" even when $TEST_PY_TEST_SPEC doesnt need a custom
  # value.
  - export UBOOT_TRAVIS_BUILD_DIR=`cd .. && pwd`/.bm-work/${TEST_PY_BD};
-   cp ~/grub_x86.efi $UBOOT_TRAVIS_BUILD_DIR/
-   cp ~/grub2-arm/usr/lib/grub2/arm-efi/grub.efi $UBOOT_TRAVIS_BUILD_DIR/grub_arm.efi
+   cp ~/grub_x86.efi $UBOOT_TRAVIS_BUILD_DIR/;
+   cp ~/grub2-arm/usr/lib/grub2/arm-efi/grub.efi $UBOOT_TRAVIS_BUILD_DIR/grub_arm.efi;
    if [[ "${TEST_PY_BD}" != "" ]]; then
      ./test/py/test.py --bd ${TEST_PY_BD} ${TEST_PY_ID}
        -k "${TEST_PY_TEST_SPEC:-not a_test_which_does_not_exist}"
