@@ -23,7 +23,6 @@
 	compatible = "xlnx,zynq-7000";
 
 	aliases {
-		ethernet0 = &gem0;
 		serial0 = &uart1;
 		serial1 = &uart0;
 		spi0 = &qspi;
