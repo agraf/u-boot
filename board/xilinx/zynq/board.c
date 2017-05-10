@@ -31,6 +31,8 @@ static xilinx_desc fpga045 = XILINX_XC7Z045_DESC(0x45);
 static xilinx_desc fpga100 = XILINX_XC7Z100_DESC(0x100);
 #endif
 
+void myir_init(void);
+
 int board_init(void)
 {
 #if (defined(CONFIG_FPGA) && !defined(CONFIG_SPL_BUILD)) || \
@@ -78,6 +80,8 @@ int board_init(void)
 	fpga_init();
 	fpga_add(fpga_xilinx, &fpga);
 #endif
+
+	myir_init();
 
 	return 0;
 }
