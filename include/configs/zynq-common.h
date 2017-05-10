@@ -189,29 +189,35 @@
 #else
 #include <config_distro_defaults.h>
 
-#ifdef CONFIG_ZYNQ_SDHCI
+#ifdef CONFIG_CMD_MMC
 #define BOOT_TARGET_DEVICES_MMC(func) func(MMC, mmc, 0)
 #else
 #define BOOT_TARGET_DEVICES_MMC(func)
 #endif
 
-#ifdef CONFIG_ZYNQ_USB
+#ifdef CONFIG_CMD_USB
 #define BOOT_TARGET_DEVICES_USB(func) func(USB, usb, 0)
 #else
 #define BOOT_TARGET_DEVICES_USB(func)
 #endif
 
-#if defined(CONFIG_ZYNQ_GEM)
-#define BOOT_TARGET_DEVICES_ETH(func) func(PXE, pxe, na) \
-				      func(DHCP, dhcp, na)
+#if defined(CONFIG_CMD_PXE)
+#define BOOT_TARGET_DEVICES_PXE(func) func(PXE, pxe, na)
 #else
-#define BOOT_TARGET_DEVICES_ETH(func)
+#define BOOT_TARGET_DEVICES_PXE(func)
+#endif
+
+#if defined(CONFIG_CMD_DHCP)
+#define BOOT_TARGET_DEVICES_DHCP(func) func(DHCP, dhcp, na)
+#else
+#define BOOT_TARGET_DEVICES_DHCP(func)
 #endif
 
 #define BOOT_TARGET_DEVICES(func) \
 	BOOT_TARGET_DEVICES_MMC(func) \
 	BOOT_TARGET_DEVICES_USB(func) \
-	BOOT_TARGET_DEVICES_ETH(func)
+	BOOT_TARGET_DEVICES_PXE(func) \
+	BOOT_TARGET_DEVICES_DHCP(func)
 
 #include <config_distro_bootcmd.h>
 #endif /* CONFIG_SPL_BUILD */
