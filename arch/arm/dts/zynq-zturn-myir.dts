@@ -96,6 +96,28 @@
 			autorepeat;
 		};
 	};
+
+	axi: axi {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		interrupt-parent = <&intc>;
+		ranges;
+
+		sdcard: sdcard@43c00000 {
+			compatible = "agraf,sdcard-1.0";
+			reg = <0x43c00000 0x10000
+			       0x50000000 0x20000
+			       0x41300000 0x10000>;
+			interrupts = <0 91 4>;
+			interrupt-parent = <&intc>;
+		};
+	};
+};
+
+&cpu0 {
+	/* Broken for me ... */
+	/delete-property/ operating-points;
 };
 
 &clkc {
@@ -120,6 +142,10 @@
 
 &sdhci0 {
 	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&sdhci1 {
 	status = "okay";
 };
 
