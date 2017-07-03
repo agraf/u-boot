@@ -166,7 +166,7 @@ int board_init(void)
 {
 	printf("EL Level:\tEL%d\n", current_el());
 
-#if defined(CONFIG_FPGA) && defined(CONFIG_FPGA_ZYNQMPPL) && \
+#if 0 && defined(CONFIG_FPGA) && defined(CONFIG_FPGA_ZYNQMPPL) && \
     !defined(CONFIG_SPL_BUILD) || (defined(CONFIG_SPL_FPGA_SUPPORT) && \
     defined(CONFIG_SPL_BUILD))
 	if (current_el() != 3) {
