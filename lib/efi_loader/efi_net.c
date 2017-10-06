@@ -183,6 +183,8 @@ static efi_status_t EFIAPI efi_net_receive(struct efi_simple_network *this,
 	eth_rx();
 	push_packet = NULL;
 
+	efi_timer_check();
+
 	if (!new_rx_packet)
 		return EFI_EXIT(EFI_NOT_READY);
 
