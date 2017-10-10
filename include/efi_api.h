@@ -17,6 +17,7 @@
 #define _EFI_API_H
 
 #include <efi.h>
+#include <charset.h>
 
 #ifdef CONFIG_EFI_LOADER
 #include <asm/setjmp.h>
@@ -695,6 +696,266 @@ struct efi_device_path_utilities_protocol {
 		uint8_t node_type,
 		uint8_t node_sub_type,
 		uint16_t node_length);
+};
+
+#define EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID \
+	EFI_GUID(0x587e72d7, 0xcc50, 0x4f79, \
+		 0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f)
+
+typedef uint16_t efi_string_id_t;
+
+struct efi_hii_config_routing_protocol {
+	efi_status_t(EFIAPI *extract_config)(
+		const struct efi_hii_config_routing_protocol *this,
+		const efi_string_t request,
+		efi_string_t *progress,
+		efi_string_t *results);
+	efi_status_t(EFIAPI *export_config)(
+		const struct efi_hii_config_routing_protocol *this,
+		efi_string_t *results);
+	efi_status_t(EFIAPI *route_config)(
+		const struct efi_hii_config_routing_protocol *this,
+		const efi_string_t configuration,
+		efi_string_t *progress);
+	efi_status_t(EFIAPI *block_to_config)(
+		const struct efi_hii_config_routing_protocol *this,
+		const efi_string_t config_request,
+		const uint8_t *block,
+		const efi_uintn_t block_size,
+		efi_string_t *config,
+		efi_string_t *progress);
+	efi_status_t(EFIAPI *config_to_block)(
+		const struct efi_hii_config_routing_protocol *this,
+		const efi_string_t config_resp,
+		const uint8_t *block,
+		const efi_uintn_t *block_size,
+		efi_string_t *progress);
+	efi_status_t(EFIAPI *get_alt_config)(
+		const struct efi_hii_config_routing_protocol *this,
+		const efi_string_t config_resp,
+		const efi_guid_t *guid,
+		const efi_string_t name,
+		const struct efi_device_path *device_path,
+		const efi_string_t alt_cfg_id,
+		efi_string_t *alt_cfg_resp);
+};
+
+#define EFI_HII_DATABASE_PROTOCOL_GUID	     \
+	EFI_GUID(0xef9fc172, 0xa1b2, 0x4693, \
+		 0xb3, 0x27, 0x6d, 0x32, 0xfc, 0x41, 0x60, 0x42)
+
+typedef enum {
+	EFI_KEY_LCTRL, EFI_KEY_A0, EFI_KEY_LALT, EFI_KEY_SPACE_BAR,
+	EFI_KEY_A2, EFI_KEY_A3, EFI_KEY_A4, EFI_KEY_RCTRL, EFI_KEY_LEFT_ARROW,
+	EFI_KEY_DOWN_ARROW, EFI_KEY_RIGHT_ARROW, EFI_KEY_ZERO,
+	EFI_KEY_PERIOD, EFI_KEY_ENTER, EFI_KEY_LSHIFT, EFI_KEY_B0,
+	EFI_KEY_B1, EFI_KEY_B2, EFI_KEY_B3, EFI_KEY_B4, EFI_KEY_B5, EFI_KEY_B6,
+	EFI_KEY_B7, EFI_KEY_B8, EFI_KEY_B9, EFI_KEY_B10, EFI_KEY_RSHIFT,
+	EFI_KEY_UP_ARROW, EFI_KEY_ONE, EFI_KEY_TWO, EFI_KEY_THREE,
+	EFI_KEY_CAPS_LOCK, EFI_KEY_C1, EFI_KEY_C2, EFI_KEY_C3, EFI_KEY_C4,
+	EFI_KEY_C5, EFI_KEY_C6, EFI_KEY_C7, EFI_KEY_C8, EFI_KEY_C9,
+	EFI_KEY_C10, EFI_KEY_C11, EFI_KEY_C12, EFI_KEY_FOUR, EFI_KEY_FIVE,
+	EFI_KEY_SIX, EFI_KEY_PLUS, EFI_KEY_TAB, EFI_KEY_D1, EFI_KEY_D2,
+	EFI_KEY_D3, EFI_KEY_D4, EFI_KEY_D5, EFI_KEY_D6, EFI_KEY_D7, EFI_KEY_D8,
+	EFI_KEY_D9, EFI_KEY_D10, EFI_KEY_D11, EFI_KEY_D12, EFI_KEY_D13,
+	EFI_KEY_DEL, EFI_KEY_END, EFI_KEY_PG_DN, EFI_KEY_SEVEN, EFI_KEY_EIGHT,
+	EFI_KEY_NINE, EFI_KEY_E0, EFI_KEY_E1, EFI_KEY_E2, EFI_KEY_E3,
+	EFI_KEY_E4, EFI_KEY_E5, EFI_KEY_E6, EFI_KEY_E7, EFI_KEY_E8, EFI_KEY_E9,
+	EFI_KEY_E10, EFI_KEY_E11, EFI_KEY_E12, EFI_KEY_BACK_SPACE,
+	EFI_KEY_INS, EFI_KEY_HOME, EFI_KEY_PG_UP, EFI_KEY_NLCK, EFI_KEY_SLASH,
+	EFI_KEY_ASTERISK, EFI_KEY_MINUS, EFI_KEY_ESC, EFI_KEY_F1, EFI_KEY_F2,
+	EFI_KEY_F3, EFI_KEY_F4, EFI_KEY_F5, EFI_KEY_F6, EFI_KEY_F7, EFI_KEY_F8,
+	EFI_KEY_F9, EFI_KEY_F10, EFI_KEY_F11, EFI_KEY_F12, EFI_KEY_PRINT,
+	EFI_KEY_SLCK, EFI_KEY_PAUSE,
+} efi_key;
+
+struct efi_key_descriptor {
+	efi_key key;
+	uint16_t unicode;
+	uint16_t shifted_unicode;
+	uint16_t alt_gr_unicode;
+	uint16_t shifted_alt_gr_unicode;
+	uint16_t modifier;
+	uint16_t affected_attribute;
+};
+
+struct efi_hii_keyboard_layout {
+	uint16_t layout_length;
+	efi_guid_t guid;
+	uint32_t layout_descriptor_string_offset;
+	uint8_t descriptor_count;
+	struct efi_key_descriptor descriptors[];
+};
+
+struct efi_hii_package_list_header {
+	efi_guid_t package_list_guid;
+	uint32_t package_length;
+} __packed;
+
+struct efi_hii_package_header {
+	uint32_t length : 24;
+	uint32_t type : 8;
+} __packed;
+
+#define EFI_HII_PACKAGE_TYPE_ALL          0x00
+#define EFI_HII_PACKAGE_TYPE_GUID         0x01
+#define EFI_HII_PACKAGE_FORMS             0x02
+#define EFI_HII_PACKAGE_STRINGS           0x04
+#define EFI_HII_PACKAGE_FONTS             0x05
+#define EFI_HII_PACKAGE_IMAGES            0x06
+#define EFI_HII_PACKAGE_SIMPLE_FONTS      0x07
+#define EFI_HII_PACKAGE_DEVICE_PATH       0x08
+#define EFI_HII_PACKAGE_KEYBOARD_LAYOUT   0x09
+#define EFI_HII_PACKAGE_ANIMATIONS        0x0A
+#define EFI_HII_PACKAGE_END               0xDF
+#define EFI_HII_PACKAGE_TYPE_SYSTEM_BEGIN 0xE0
+#define EFI_HII_PACKAGE_TYPE_SYSTEM_END   0xFF
+
+struct efi_hii_strings_package {
+	struct efi_hii_package_header header;
+	uint32_t header_size;
+	uint32_t string_info_offset;
+	uint16_t language_window[16];
+	efi_string_id_t language_name;
+	uint8_t  language[];
+} __packed;
+
+struct efi_hii_string_block {
+	uint8_t block_type;
+	/*uint8_t block_body[];*/
+} __packed;
+
+#define EFI_HII_SIBT_END               0x00 // The end of the string information.
+#define EFI_HII_SIBT_STRING_SCSU       0x10 // Single string using default font information.
+#define EFI_HII_SIBT_STRING_SCSU_FONT  0x11 // Single string with font information.
+#define EFI_HII_SIBT_STRINGS_SCSU      0x12 // Multiple strings using default font information.
+#define EFI_HII_SIBT_STRINGS_SCSU_FONT 0x13 // Multiple strings with font information.
+#define EFI_HII_SIBT_STRING_UCS2       0x14 // Single UCS-2 string using default font information.
+#define EFI_HII_SIBT_STRING_UCS2_FONT  0x15 // Single UCS-2 string with font information
+#define EFI_HII_SIBT_STRINGS_UCS2      0x16 // Multiple UCS-2 strings using default font information.
+#define EFI_HII_SIBT_STRINGS_UCS2_FONT 0x17 // Multiple UCS-2 strings with font information.
+#define EFI_HII_SIBT_DUPLICATE         0x20 // Create a duplicate of an existing string.
+#define EFI_HII_SIBT_SKIP2             0x21 // Skip a certain number of string identifiers.
+#define EFI_HII_SIBT_SKIP1             0x22 // Skip a certain number of string identifiers.
+#define EFI_HII_SIBT_EXT1              0x30 // For future expansion (one byte length field)
+#define EFI_HII_SIBT_EXT2              0x31 // For future expansion (two byte length field)
+#define EFI_HII_SIBT_EXT4              0x32 // For future expansion (four byte length field)
+#define EFI_HII_SIBT_FONT              0x40 // Font information.
+
+struct efi_hii_sibt_string_ucs2_block {
+	struct efi_hii_string_block header;
+	uint16_t string_text[];
+} __packed;
+
+static inline struct efi_hii_string_block *efi_hii_sibt_string_ucs2_block_next(
+	struct efi_hii_sibt_string_ucs2_block *blk)
+{
+	return ((void *)blk) + sizeof(*blk) +
+		(utf16_strlen(blk->string_text) + 1) * 2;
+}
+
+typedef void *efi_hii_handle_t;
+
+struct efi_hii_database_protocol {
+	efi_status_t(EFIAPI *new_package_list)(
+		const struct efi_hii_database_protocol *this,
+		const struct efi_hii_package_list_header *package_list,
+		const efi_handle_t driver_handle,
+		efi_hii_handle_t *handle);
+	efi_status_t(EFIAPI *remove_package_list)(
+		const struct efi_hii_database_protocol *this,
+		efi_hii_handle_t handle);
+	efi_status_t(EFIAPI *update_package_list)(
+		const struct efi_hii_database_protocol *this,
+		efi_hii_handle_t handle,
+		const struct efi_hii_package_list_header *package_list);
+	efi_status_t(EFIAPI *list_package_lists)(
+		const struct efi_hii_database_protocol *this,
+		uint8_t package_type,
+		const efi_guid_t *package_guid,
+		efi_uintn_t *handle_buffer_length,
+		efi_hii_handle_t *handle);
+	efi_status_t(EFIAPI *export_package_lists)(
+		const struct efi_hii_database_protocol *this,
+		efi_hii_handle_t handle,
+		efi_uintn_t *buffer_size,
+		struct efi_hii_package_list_header *buffer);
+	efi_status_t(EFIAPI *register_package_notify)(
+		const struct efi_hii_database_protocol *this,
+		uint8_t package_type,
+		const efi_guid_t *package_guid,
+		const void *package_notify_fn,
+		efi_uintn_t notify_type,
+		efi_handle_t *notify_handle);
+	efi_status_t(EFIAPI *unregister_package_notify)(
+		const struct efi_hii_database_protocol *this,
+		efi_handle_t notification_handle
+		);
+	efi_status_t(EFIAPI *find_keyboard_layouts)(
+		const struct efi_hii_database_protocol *this,
+		uint16_t *key_guid_buffer_length,
+		efi_guid_t *key_guid_buffer);
+	efi_status_t(EFIAPI *get_keyboard_layout)(
+		const struct efi_hii_database_protocol *this,
+		efi_guid_t *key_guid,
+		uint16_t *keyboard_layout_length,
+		struct efi_hii_keyboard_layout *keyboard_layout);
+	efi_status_t(EFIAPI *set_keyboard_layout)(
+		const struct efi_hii_database_protocol *this,
+		efi_guid_t *key_guid);
+	efi_status_t(EFIAPI *get_package_list_handle)(
+		const struct efi_hii_database_protocol *this,
+		efi_hii_handle_t package_list_handle,
+		efi_handle_t *driver_handle);
+};
+
+#define EFI_HII_STRING_PROTOCOL_GUID \
+	EFI_GUID(0x0fd96974, 0x23aa, 0x4cdc, \
+		 0xb9, 0xcb, 0x98, 0xd1, 0x77, 0x50, 0x32, 0x2a)
+
+typedef uint32_t efi_hii_font_style_t;
+
+struct efi_font_info {
+	efi_hii_font_style_t font_style;
+	uint16_t font_size;
+	uint16_t font_name[1];
+};
+
+struct efi_hii_string_protocol {
+	efi_status_t(EFIAPI *new_string)(
+		const struct efi_hii_string_protocol *this,
+		efi_hii_handle_t package_list,
+		efi_string_id_t *string_id,
+		const uint8_t *language,
+		const uint16_t *language_name,
+		const efi_string_t string,
+		const struct efi_font_info *string_font_info);
+	efi_status_t(EFIAPI *get_string)(
+		const struct efi_hii_string_protocol *this,
+		const uint8_t *language,
+		efi_hii_handle_t package_list,
+		efi_string_id_t string_id,
+		efi_string_t string,
+		efi_uintn_t *string_size,
+		struct efi_font_info **string_font_info);
+	efi_status_t(EFIAPI *set_string)(
+		const struct efi_hii_string_protocol *this,
+		efi_hii_handle_t package_list,
+		efi_string_id_t string_id,
+		const uint8_t *language,
+		const efi_string_t string,
+		const struct efi_font_info *string_font_info);
+	efi_status_t(EFIAPI *get_languages)(
+		const struct efi_hii_string_protocol *this,
+		efi_hii_handle_t package_list,
+		uint8_t *languages,
+		efi_uintn_t *languages_size);
+	efi_status_t(EFIAPI *get_secondary_languages)(
+		const struct efi_hii_string_protocol *this,
+		efi_hii_handle_t package_list,
+		const uint8_t *primary_language,
+		uint8_t *secondary_languages,
+		efi_uintn_t *secondary_languages_size);
 };
 
 #define EFI_GOP_GUID \

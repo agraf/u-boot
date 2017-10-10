@@ -31,6 +31,7 @@ obj-y += efi_runtime.o
 obj-y += efi_unicode_collation.o
 obj-y += efi_variable.o
 obj-y += efi_watchdog.o
+obj-y += efi_hii.o
 obj-$(CONFIG_LCD) += efi_gop.o
 obj-$(CONFIG_DM_VIDEO) += efi_gop.o
 obj-$(CONFIG_PARTITIONS) += efi_disk.o
