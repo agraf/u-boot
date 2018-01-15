@@ -45,6 +45,7 @@
 #include <asm/arch/mbox.h>
 #include <mach/sdhci.h>
 #include <mach/timer.h>
+#include <mach/gpio.h>
 
 /* 400KHz is max freq for card ID etc. Use that as min */
 #define MIN_FREQ 400000
@@ -178,6 +179,7 @@ static int bcm2835_sdhci_probe(struct udevice *dev)
 	fdt_addr_t base;
 	int emmc_freq;
 	int ret;
+	int pinctrl_handle;
 
 	base = devfdt_get_addr(dev);
 	if (base == FDT_ADDR_T_NONE)
@@ -189,6 +191,15 @@ static int bcm2835_sdhci_probe(struct udevice *dev)
 		return ret;
 	}
 	emmc_freq = ret;
+
+	pinctrl_handle = fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev), "pinctrl-0", -1);
+	if (pinctrl_handle != -1) {
+		struct udevice *dev;
+
+		/* Need to set up pinmuxing */
+		if (!uclass_first_device(UCLASS_GPIO, &dev) && dev)
+			bcm2835_gpio_set_pinmux(dev, pinctrl_handle);
+	}
 
 	/*
 	 * See the comments in bcm2835_sdhci_raw_writel().
