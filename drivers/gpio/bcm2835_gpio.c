@@ -83,6 +83,46 @@ int bcm2835_gpio_get_func_id(struct udevice *dev, unsigned gpio)
 	return (val >> BCM2835_GPIO_FSEL_SHIFT(gpio) & BCM2835_GPIO_FSEL_MASK);
 }
 
+static void bcm2835_gpio_set_func_id(struct udevice *dev, unsigned gpio, int func)
+{
+	struct bcm2835_gpios *gpios = dev_get_priv(dev);
+	u32 val;
+
+	val = readl(&gpios->reg->gpfsel[BCM2835_GPIO_FSEL_BANK(gpio)]);
+	val &= ~(BCM2835_GPIO_FSEL_MASK << BCM2835_GPIO_FSEL_SHIFT(gpio));
+	val |= (func << BCM2835_GPIO_FSEL_SHIFT(gpio));
+	writel(val, &gpios->reg->gpfsel[BCM2835_GPIO_FSEL_BANK(gpio)]);
+}
+
+void bcm2835_gpio_set_pinmux(struct udevice *dev, int handle)
+{
+	int node = fdt_node_offset_by_phandle(gd->fdt_blob, handle);
+	u32 pins[16];
+	int len;
+	u32 func;
+	int i;
+
+	if (!node)
+		goto err;
+
+	func = fdtdec_get_int(gd->fdt_blob, node, "brcm,function", -1);
+	if (func <= 0)
+		goto err;
+
+	len = fdtdec_get_int_array_count(gd->fdt_blob, node, "brcm,pins", pins,
+					 ARRAY_SIZE(pins));
+	if (len <= 0)
+		goto err;
+
+	for (i = 0; i < len; i++)
+		bcm2835_gpio_set_func_id(dev, pins[i], func);
+
+	return;
+err:
+	printf("Failed to pinmux phandle 0x%x\n", handle);
+	return;
+}
+
 static int bcm2835_gpio_get_function(struct udevice *dev, unsigned offset)
 {
 	int funcid = bcm2835_gpio_get_func_id(dev, offset);
