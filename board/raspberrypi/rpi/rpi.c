@@ -24,8 +24,15 @@
 #include <asm/armv8/mmu.h>
 #endif
 #include <watchdog.h>
+#include <asm/io.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+/*
+ * This is the GPIO pin that the user facing UART RX line is attached to.
+ * We use this pin to determine which serial device is available.
+ */
+#define BCM2835_GPIO_RX		15
 
 /* From lowlevel_init.S */
 extern unsigned long fw_dtb_pointer;
@@ -417,6 +424,68 @@ static void get_board_rev(void)
 	}
 
 	printf("RPI %s (0x%x)\n", model->name, revision);
+}
+
+/*
+ * We may get called before the device model is initialized, so we can not
+ * rely on the GPIO driver.
+ */
+int get_func_id(unsigned gpio)
+{
+	u32 val;
+	u32 node;
+	u32 *gpfsel;
+	fdt_addr_t addr;
+	fdt_size_t size;
+
+	node = fdt_node_offset_by_compatible(gd->fdt_blob, -1, "brcm,bcm2835-gpio");
+	if (node < 0)
+		return -EINVAL;
+
+	addr = fdtdec_get_addr_size_auto_noparent(gd->fdt_blob, node, "reg",
+						  0, &size, true);
+	gpfsel = (void*)addr;
+
+	val = readl(&gpfsel[BCM2835_GPIO_FSEL_BANK(gpio)]);
+
+	return (val >> BCM2835_GPIO_FSEL_SHIFT(gpio) & BCM2835_GPIO_FSEL_MASK);
+}
+
+
+/*
+ * The RPi has 2 serial ports: A PL011 based one and the mini-uart.
+ * Depending on firmware configuration, either can be configured to either
+ * nothing, the wifi adapter or serial output.
+ *
+ * We only want to use the serial port that is user facing to not
+ * end up with a potentially unresponsive serial port. Due to this
+ * we need to check whether the serial device is actually connected
+ * to the UART RX/TX pins on the RPi GPIO pin bar.
+ *
+ * We only allow U-Boot to instantiate the serial driver for the serial
+ * device that is muxed correctly.
+ */
+int board_check_serial(struct udevice *dev)
+{
+	int func;
+
+	printf("Checking serial %s\n", dev->name);
+
+	if (device_is_compatible(dev, "arm,pl011")) {
+		func = BCM2835_GPIO_ALT0;
+	} else if (device_is_compatible(dev, "brcm,bcm2835-aux-uart")) {
+		func = BCM2835_GPIO_ALT5;
+	} else {
+		return 0;
+	}
+
+	if (get_func_id(BCM2835_GPIO_RX) != func) {
+		printf("Disabling serial %s\n", dev->name);
+		return -ENODEV;
+	}
+
+	printf("Enabling serial %s\n", dev->name);
+	return 0;
 }
 
 int board_init(void)
