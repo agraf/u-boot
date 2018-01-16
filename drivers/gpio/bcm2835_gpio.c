@@ -73,7 +73,7 @@ static int bcm2835_gpio_set_value(struct udevice *dev, unsigned gpio,
 	return 0;
 }
 
-int bcm2835_gpio_get_func_id(struct udevice *dev, unsigned gpio)
+static int bcm2835_gpio_get_func_id(struct udevice *dev, unsigned gpio)
 {
 	struct bcm2835_gpios *gpios = dev_get_priv(dev);
 	u32 val;
