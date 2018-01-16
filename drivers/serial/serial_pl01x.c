@@ -357,7 +357,7 @@ static int pl01x_serial_ofdata_to_platdata(struct udevice *dev)
 	plat->clock = fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev), "clock",
 				     1);
 	plat->type = dev_get_driver_data(dev);
-	plat->skip_init = fdtdec_get_bool(gd->fdt_blob, dev_of_offset(dev),
+	plat->skip_init |= fdtdec_get_bool(gd->fdt_blob, dev_of_offset(dev),
 	                                  "skip-init");
 	return 0;
 }

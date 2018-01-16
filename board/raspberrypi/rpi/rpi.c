@@ -20,6 +20,7 @@
 #include <asm/arch/sdhci.h>
 #include <asm/global_data.h>
 #include <dm/platform_data/serial_bcm283x_mu.h>
+#include <dm/platform_data/serial_pl01x.h>
 #ifdef CONFIG_ARM64
 #include <asm/armv8/mmu.h>
 #endif
@@ -472,9 +473,15 @@ int board_check_serial(struct udevice *dev)
 	printf("Checking serial %s\n", dev->name);
 
 	if (device_is_compatible(dev, "arm,pl011")) {
+		struct pl01x_serial_platdata *plat = dev_get_platdata(dev);
+
 		func = BCM2835_GPIO_ALT0;
+		plat->skip_init = true;
 	} else if (device_is_compatible(dev, "brcm,bcm2835-aux-uart")) {
+		struct bcm283x_mu_serial_platdata *plat = dev_get_platdata(dev);
+
 		func = BCM2835_GPIO_ALT5;
+		plat->skip_init = true;
 	} else {
 		return 0;
 	}
