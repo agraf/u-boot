@@ -207,4 +207,15 @@ void sh_serial_initialize(void);
 void uartlite_serial_initialize(void);
 void zynq_serial_initialize(void);
 
+/**
+ * board_check_serial() - Determine whether a serial device works
+ *
+ * This is a board callback that allows boards to override whether a serial
+ * device is usable. By default, all devices are declared usable.
+ *
+ * @dev: Device pointer
+ * @return 0 if the device is usable, !0 otherwise
+ */
+int board_check_serial(struct udevice *dev);
+
 #endif
