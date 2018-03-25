@@ -142,6 +142,7 @@
 # define PARTS_DEFAULT
 #endif
 
+#if 0
 /* Initial environment variables */
 #ifndef CONFIG_EXTRA_ENV_SETTINGS
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -230,6 +231,7 @@
 #endif
 
 #define CONFIG_PREBOOT		"run setup"
+#endif
 
 /* Do not preserve environment */
 #define CONFIG_ENV_SIZE			0x8000
