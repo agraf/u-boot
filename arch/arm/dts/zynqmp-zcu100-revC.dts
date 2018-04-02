@@ -284,6 +284,6 @@
 	status = "okay";
 };
 
-&watchdog0 {
+/*&watchdog0 {
 	status = "okay";
-};
+};*/
