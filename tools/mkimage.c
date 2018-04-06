@@ -514,6 +514,9 @@ int main(int argc, char **argv)
 		} else if (params.type == IH_TYPE_PBLIMAGE) {
 			/* PBL has special Image format, implements its' own */
 			pbl_load_uboot(ifd, &params);
+		} else if (params.type == IH_TYPE_ZYNQMPBIF) {
+			/* Image file is meta, walk through actual targets */
+			zynqmpbif_copy_image(ifd, &params);
 		} else {
 			copy_file(ifd, params.datafile, pad_len);
 		}

@@ -129,4 +129,7 @@ struct zynqmp_header {
 	uint32_t __reserved4[66]; /* 0x9c0 */
 };
 
+void zynqmpimage_default_header(struct zynqmp_header *ptr);
+void zynqmpimage_print_header(const void *ptr);
+
 #endif /* _ZYNQMPIMAGE_H_ */
