@@ -186,6 +186,7 @@ int env_load(void)
 	struct env_driver *drv;
 	int prio;
 
+if(1) return -ENODEV;
 	for (prio = 0; (drv = env_driver_lookup(ENVOP_LOAD, prio)); prio++) {
 		int ret;
 
