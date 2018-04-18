@@ -35,9 +35,10 @@ ifeq ($(CONFIG_BLK)$(CONFIG_PARTITIONS),yy)
 obj-$(CONFIG_CMD_BOOTEFI_SELFTEST) += efi_selftest_block_device.o
 endif
 
-# TODO: As of v2018.01 the relocation code for the EFI application cannot
-# be built on x86_64.
+# TODO: As of v2018.05 the relocation code for the EFI application cannot
+# be built on x86_64 / RISC-V.
 ifeq ($(CONFIG_X86_64),)
+ifeq ($(CONFIG_RISCV),)
 
 ifneq ($(CONFIG_CMD_BOOTEFI_SELFTEST),)
 
@@ -63,6 +64,8 @@ $(obj)/efi_selftest_startimage_exit.o: $(obj)/efi_miniapp_file_image_exit.h
 
 $(obj)/efi_selftest_startimage_return.o: $(obj)/efi_miniapp_file_image_return.h
 
-endif
+endif # CONFIG_CMD_BOOTEFI_SELFTEST
 
-endif
+endif # !CONFIG_RISCV
+
+endif # !CONFIG_X86_64
