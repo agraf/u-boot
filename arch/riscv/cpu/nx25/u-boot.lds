@@ -38,6 +38,22 @@ SECTIONS
 		KEEP(*(SORT(.u_boot_list*)));
 	}
 
+	. = ALIGN(4);
+
+	.efi_runtime : {
+                __efi_runtime_start = .;
+		*(efi_runtime_text)
+		*(efi_runtime_data)
+                __efi_runtime_stop = .;
+	}
+
+	.efi_runtime_rel : {
+                __efi_runtime_rel_start = .;
+		*(.relaefi_runtime_text)
+		*(.relaefi_runtime_data)
+                __efi_runtime_rel_stop = .;
+	}
+
     . = ALIGN(4);
 
     /DISCARD/ : { *(.rela.plt*) }
