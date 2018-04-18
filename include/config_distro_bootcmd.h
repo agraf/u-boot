@@ -100,6 +100,10 @@
 #define BOOTEFI_NAME "bootia32.efi"
 #elif defined(CONFIG_X86_RUN_64BIT)
 #define BOOTEFI_NAME "bootx64.efi"
+#elif defined(CONFIG_CPU_RISCV_32)
+#define BOOTEFI_NAME "bootriscv32.efi"
+#elif defined(CONFIG_CPU_RISCV_64)
+#define BOOTEFI_NAME "bootriscv64.efi"
 #endif
 #endif
 
@@ -250,7 +254,15 @@
 #elif defined(CONFIG_X86)
 /* Always assume we're running 64bit */
 #define BOOTENV_EFI_PXE_ARCH "0x7"
-#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00007:UNDI:003000"
+#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:0000:UNDI:003000"
+#elif defined(CONFIG_CPU_RISCV_32)
+/* TODO: Register VCI identifier via RFC */
+#define BOOTENV_EFI_PXE_ARCH "0x5032"
+#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:5032:UNDI:003000"
+#elif defined(CONFIG_CPU_RISCV_64)
+/* TODO: Register VCI identifier via RFC */
+#define BOOTENV_EFI_PXE_ARCH "0x5064"
+#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:5064:UNDI:003000"
 #else
 #error Please specify an EFI client identifier
 #endif
