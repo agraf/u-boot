@@ -34,6 +34,15 @@ static efi_status_t efi_obj_list_initialized = OBJ_LIST_NOT_INITIALIZED;
 
 static struct efi_device_path *bootefi_image_path;
 static struct efi_device_path *bootefi_device_path;
+#if 1
+#define DXE_TABLE_GUID \
+	((efi_guid_t)EFI_GUID(0x05AD34BA, 0x6F02, 0x4214, \
+		0x95, 0x2E, 0x4D, 0xA0, 0x39, 0x8E, 0x2B, 0xB9))
+
+#define HOB_LIST_GUID \
+	((efi_guid_t)EFI_GUID(0x7739F24C, 0x93D7, 0x11D4, \
+		0x9A, 0x3A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D))
+#endif
 
 /* Initialize and populate EFI object list */
 efi_status_t efi_init_obj_list(void)
@@ -91,6 +100,26 @@ efi_status_t efi_init_obj_list(void)
 	if (ret != EFI_SUCCESS)
 		goto out;
 
+#if 1
+{
+	efi_guid_t guid = DXE_TABLE_GUID;
+	/* Map within the low 32 bits, to allow for 32bit SMBIOS tables */
+	u64 table = U32_MAX;
+	efi_status_t ret;
+
+	/* Reserve 4kiB page for SMBIOS */
+	ret = efi_allocate_pages(EFI_ALLOCATE_MAX_ADDRESS,
+				EFI_RUNTIME_SERVICES_DATA, 1, &table);
+	if (ret != EFI_SUCCESS)
+		return ret;
+
+	/* And expose them to our EFI payload */
+	ret = efi_install_configuration_table(&guid, (void *)(uintptr_t)table);
+
+	guid = HOB_LIST_GUID;
+	ret = efi_install_configuration_table(&guid, (void *)(uintptr_t)table);
+}
+#endif
 	/* Initialize EFI runtime services */
 	ret = efi_reset_system_init();
 	if (ret != EFI_SUCCESS)
