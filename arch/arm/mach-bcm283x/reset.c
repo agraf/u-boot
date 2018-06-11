@@ -59,11 +59,13 @@ void __efi_runtime EFIAPI efi_reset_system(
 {
 	u32 val;
 
-	if (reset_type == EFI_RESET_COLD ||
-	    reset_type == EFI_RESET_WARM ||
-	    reset_type == EFI_RESET_PLATFORM_SPECIFIC) {
+	switch (reset_type) {
+	case EFI_RESET_COLD:
+	case EFI_RESET_WARM:
+	case EFI_RESET_PLATFORM_SPECIFIC:
 		reset_cpu(0);
-	} else if (reset_type == EFI_RESET_SHUTDOWN) {
+		break;
+	case EFI_RESET_SHUTDOWN:
 		/*
 		 * We set the watchdog hard reset bit here to distinguish this reset
 		 * from the normal (full) reset. bootcode.bin will not reboot after a
@@ -74,6 +76,7 @@ void __efi_runtime EFIAPI efi_reset_system(
 		val |= BCM2835_WDOG_RSTS_RASPBERRYPI_HALT;
 		writel(val, &wdog_regs->rsts);
 		reset_cpu(0);
+		break;
 	}
 
 	while (1) { }
