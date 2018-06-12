@@ -27,7 +27,7 @@ else
 PLATFORM_CPPFLAGS += $(if $(CONFIG_SPL_BUILD),,-fpic) -fno-common -m64
 endif
 
-PLATFORM_RELFLAGS += -ffunction-sections -fvisibility=hidden
+PLATFORM_RELFLAGS += -ffunction-sections -fdata-sections -fvisibility=hidden
 
 PLATFORM_LDFLAGS += -Bsymbolic -Bsymbolic-functions
 PLATFORM_LDFLAGS += -m $(if $(IS_32BIT),elf_i386,elf_x86_64)
