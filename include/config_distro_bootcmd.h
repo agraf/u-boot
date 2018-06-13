@@ -251,6 +251,8 @@
 #elif defined(CONFIG_ARM)
 #define BOOTENV_EFI_PXE_ARCH "0xa"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00010:UNDI:003000"
+
+/* For sandbox we only support 64-bit x86 at present */
 #elif defined(CONFIG_X86)
 /* Always assume we're running 64bit */
 #define BOOTENV_EFI_PXE_ARCH "0x7"
@@ -261,6 +263,17 @@
 #elif defined(CONFIG_CPU_RISCV_64)
 #define BOOTENV_EFI_PXE_ARCH "0x1b"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00027:UNDI:003000"
+#elif defined(CONFIG_SANDBOX)
+/*
+ * TODO(sjg@chromium.org): Consider providing a way to enable sandbox features
+ * based on the host architecture
+ */
+# ifndef __x86_64__
+#  warning "sandbox EFI support is only tested on 64-bit x86"
+# endif
+/* To support other *host* architectures this should be changed */
+#define BOOTENV_EFI_PXE_ARCH "0x7"
+#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00007:UNDI:003000"
 #else
 #error Please specify an EFI client identifier
 #endif
