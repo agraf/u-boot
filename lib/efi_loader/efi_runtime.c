@@ -62,6 +62,18 @@ struct dyn_sym {
 #define R_ABSOLUTE	R_RISCV_64
 #define SYM_INDEX	32
 #endif
+
+/* For sandbox we only support 64-bit x86 at present */
+#elif defined(CONFIG_SANDBOX)
+/*
+ * TODO(sjg@chromium.org): Consider providing a way to enable sandbox features
+ * based on the host architecture
+ */
+# ifndef __x86_64__
+#  warning "sandbox EFI support is only tested on 64-bit x86"
+# endif
+#define R_RELATIVE	8
+#define R_MASK		0xffffffffULL
 #else
 #error Need to add relocation awareness
 #endif
