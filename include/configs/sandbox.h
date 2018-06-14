@@ -6,12 +6,18 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+/* Size of our emulated memory */
+#define CONFIG_SYS_SDRAM_BASE		0x8000000
+#define CONFIG_SYS_SDRAM_SIZE		(128 << 20)
+#define CONFIG_SYS_MONITOR_BASE	0
+#define CONFIG_NR_DRAM_BANKS		1
+
 #ifdef FTRACE
 #define CONFIG_TRACE
 #define CONFIG_TRACE_BUFFER_SIZE	(16 << 20)
 #define CONFIG_TRACE_EARLY_SIZE		(8 << 20)
 #define CONFIG_TRACE_EARLY
-#define CONFIG_TRACE_EARLY_ADDR		0x00100000
+#define CONFIG_TRACE_EARLY_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x100000)
 
 #endif
 
@@ -30,7 +36,7 @@
 /*
  * Size of malloc() pool, before and after relocation
  */
-#define CONFIG_MALLOC_F_ADDR		0x0010000
+#define CONFIG_MALLOC_F_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x10000)
 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)	/* 32MB  */
 
 #define CONFIG_SYS_CBSIZE		1024	/* Console I/O Buffer Size */
@@ -44,18 +50,12 @@
 #define CONFIG_I2C_EDID
 
 /* Memory things - we don't really want a memory test */
-#define CONFIG_SYS_LOAD_ADDR		0x00000000
-#define CONFIG_SYS_MEMTEST_START	0x00100000
+#define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_SDRAM_BASE
+#define CONFIG_SYS_MEMTEST_START	(CONFIG_SYS_SDRAM_BASE + 0x100000)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + 0x1000)
-#define CONFIG_SYS_FDT_LOAD_ADDR	        0x100
+#define CONFIG_SYS_FDT_LOAD_ADDR	(CONFIG_SYS_SDRAM_BASE + 0x100)
 
 #define CONFIG_PHYSMEM
-
-/* Size of our emulated memory */
-#define CONFIG_SYS_SDRAM_BASE		0
-#define CONFIG_SYS_SDRAM_SIZE		(128 << 20)
-#define CONFIG_SYS_MONITOR_BASE	0
-#define CONFIG_NR_DRAM_BANKS		1
 
 #define CONFIG_SYS_BAUDRATE_TABLE	{4800, 9600, 19200, 38400, 57600,\
 					115200}
@@ -104,11 +104,11 @@
 
 #define MEM_LAYOUT_ENV_SETTINGS \
 	"bootm_size=0x10000000\0" \
-	"kernel_addr_r=0x1000000\0" \
-	"fdt_addr_r=0xc00000\0" \
-	"ramdisk_addr_r=0x2000000\0" \
-	"scriptaddr=0x1000\0" \
-	"pxefile_addr_r=0x2000\0"
+	"kernel_addr_r=0x9000000\0" \
+	"fdt_addr_r=0x8c00000\0" \
+	"ramdisk_addr_r=0xa000000\0" \
+	"scriptaddr=0x8001000\0" \
+	"pxefile_addr_r=0x8002000\0"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	SANDBOX_SERIAL_SETTINGS \

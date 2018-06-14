@@ -50,3 +50,12 @@ SECTIONS
 }
 
 INSERT BEFORE .data;
+
+SECTIONS
+{
+	.ram 0x8000000 : {
+		*(.ram)
+	}
+}
+
+INSERT BEFORE .bss;

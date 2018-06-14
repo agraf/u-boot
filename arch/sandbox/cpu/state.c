@@ -12,6 +12,7 @@
 /* Main state record for the sandbox */
 static struct sandbox_state main_state;
 static struct sandbox_state *state;	/* Pointer to current state record */
+static __attribute__ ((section (".ram"))) u8 sandbox_ram[CONFIG_SYS_SDRAM_SIZE];
 
 static int state_ensure_space(int extra_size)
 {
@@ -366,8 +367,7 @@ int state_init(void)
 	state = &main_state;
 
 	state->ram_size = CONFIG_SYS_SDRAM_SIZE;
-	state->ram_buf = os_malloc(state->ram_size);
-	assert(state->ram_buf);
+	state->ram_buf = sandbox_ram;
 
 	state_reset_for_test(state);
 	/*

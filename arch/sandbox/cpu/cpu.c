@@ -5,7 +5,6 @@
 #define DEBUG
 #include <common.h>
 #include <dm.h>
-#include <efi_loader.h>
 #include <errno.h>
 #include <linux/libfdt.h>
 #include <os.h>
@@ -58,16 +57,6 @@ int cleanup_before_linux_select(int flags)
 	return 0;
 }
 
-void *phys_to_virt(phys_addr_t paddr)
-{
-	return (void *)(gd->arch.ram_buf + paddr);
-}
-
-phys_addr_t virt_to_phys(void *vaddr)
-{
-	return (phys_addr_t)((uint8_t *)vaddr - gd->arch.ram_buf);
-}
-
 void *map_physmem(phys_addr_t paddr, unsigned long len, unsigned long flags)
 {
 #if defined(CONFIG_PCI) && !defined(CONFIG_SPL_BUILD)
@@ -101,11 +90,6 @@ void unmap_physmem(const void *vaddr, unsigned long flags)
 void sandbox_set_enable_pci_map(int enable)
 {
 	enable_pci_map = enable;
-}
-
-phys_addr_t map_to_sysmem(const void *ptr)
-{
-	return (u8 *)ptr - gd->arch.ram_buf;
 }
 
 void flush_dcache_range(unsigned long start, unsigned long stop)
@@ -178,22 +162,3 @@ void longjmp(jmp_buf jmp, int ret)
 	while (1)
 		;
 }
-
-#ifdef CONFIG_EFI_LOADER
-
-/*
- * In sandbox, we don't have a 1:1 map, so we need to expose
- * process addresses instead of U-Boot addresses
- */
-void efi_add_known_memory(void)
-{
-	u64 ram_start = (uintptr_t)map_sysmem(0, gd->ram_size);
-	u64 ram_size = gd->ram_size;
-	u64 start = (ram_start + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
-	u64 pages = (ram_size + EFI_PAGE_MASK) >> EFI_PAGE_SHIFT;
-
-	efi_add_memory_map(start, pages, EFI_CONVENTIONAL_MEMORY,
-			   false);
-}
-
-#endif

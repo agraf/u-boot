@@ -867,7 +867,7 @@ endif
 
 # Normally we fill empty space with 0xff
 quiet_cmd_objcopy = OBJCOPY $@
-cmd_objcopy = $(OBJCOPY) --gap-fill=0xff $(OBJCOPYFLAGS) \
+cmd_objcopy = $(OBJCOPY) --gap-fill=0xff -R .ram $(OBJCOPYFLAGS) \
 	$(OBJCOPYFLAGS_$(@F)) $< $@
 
 # Provide a version which does not do this, for use by EFI

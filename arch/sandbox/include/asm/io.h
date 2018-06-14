@@ -6,12 +6,6 @@
 #ifndef __SANDBOX_ASM_IO_H
 #define __SANDBOX_ASM_IO_H
 
-void *phys_to_virt(phys_addr_t paddr);
-#define phys_to_virt phys_to_virt
-
-phys_addr_t virt_to_phys(void *vaddr);
-#define virt_to_phys virt_to_phys
-
 void *map_physmem(phys_addr_t paddr, unsigned long len, unsigned long flags);
 #define map_physmem map_physmem
 
@@ -23,20 +17,19 @@ void unmap_physmem(const void *vaddr, unsigned long flags);
 
 #include <asm-generic/io.h>
 
-/* For sandbox, we want addresses to point into our RAM buffer */
 static inline void *map_sysmem(phys_addr_t paddr, unsigned long len)
 {
-	return map_physmem(paddr, len, MAP_WRBACK);
+	return (void *)(unsigned long)paddr;
 }
 
-/* Remove a previous mapping */
 static inline void unmap_sysmem(const void *vaddr)
 {
-	unmap_physmem(vaddr, MAP_WRBACK);
 }
 
-/* Map from a pointer to our RAM buffer */
-phys_addr_t map_to_sysmem(const void *ptr);
+static inline phys_addr_t map_to_sysmem(const void *ptr)
+{
+	return (phys_addr_t)(unsigned long)ptr;
+}
 
 /* Define nops for sandbox I/O access */
 #define readb(addr) ((void)addr, 0)
