@@ -431,7 +431,7 @@ static int zynq_loadfs(xilinx_desc *desc, const void *buf, size_t bsize,
 	if (fs_set_blk_dev(interface, dev_part, fstype))
 		return FPGA_FAIL;
 
-	if (fs_read(filename, (u32) buf, pos, blocksize, &actread) < 0)
+	if (fs_read(filename, (void *)buf, pos, blocksize, &actread) < 0)
 		return FPGA_FAIL;
 
 	if (zynq_validate_bitstream(desc, buf, bsize, blocksize, &swap,
@@ -454,10 +454,12 @@ static int zynq_loadfs(xilinx_desc *desc, const void *buf, size_t bsize,
 			return FPGA_FAIL;
 
 		if (bsize > blocksize) {
-			if (fs_read(filename, (u32) buf, pos, blocksize, &actread) < 0)
+			if (fs_read(filename, (void *)buf, pos, blocksize,
+				    &actread) < 0)
 				return FPGA_FAIL;
 		} else {
-			if (fs_read(filename, (u32) buf, pos, bsize, &actread) < 0)
+			if (fs_read(filename, (void *)buf, pos, bsize,
+				    &actread) < 0)
 				return FPGA_FAIL;
 		}
 	} while (bsize > blocksize);

@@ -233,8 +233,7 @@ static efi_status_t file_read(struct file_handle *fh, u64 *buffer_size,
 {
 	loff_t actread;
 
-	if (fs_read(fh->path, (ulong)buffer, fh->offset,
-		    *buffer_size, &actread))
+	if (fs_read(fh->path, buffer, fh->offset, *buffer_size, &actread))
 		return EFI_DEVICE_ERROR;
 
 	*buffer_size = actread;
@@ -363,8 +362,7 @@ static efi_status_t EFIAPI efi_file_write(struct efi_file_handle *file,
 		goto error;
 	}
 
-	if (fs_write(fh->path, (ulong)buffer, fh->offset, *buffer_size,
-		     &actwrite)) {
+	if (fs_write(fh->path, buffer, fh->offset, *buffer_size, &actwrite)) {
 		ret = EFI_DEVICE_ERROR;
 		goto error;
 	}

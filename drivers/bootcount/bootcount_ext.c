@@ -24,10 +24,10 @@ void bootcount_store(ulong a)
 	buf = map_sysmem(CONFIG_SYS_BOOTCOUNT_ADDR, 2);
 	buf[0] = BC_MAGIC;
 	buf[1] = (a & 0xff);
-	unmap_sysmem(buf);
 
-	ret = fs_write(CONFIG_SYS_BOOTCOUNT_EXT_NAME,
-		       CONFIG_SYS_BOOTCOUNT_ADDR, 0, 2, &len);
+	ret = fs_write(CONFIG_SYS_BOOTCOUNT_EXT_NAME, buf, 0, 2, &len);
+
+	unmap_sysmem(buf);
 	if (ret != 0)
 		puts("Error storing bootcount\n");
 }
@@ -44,14 +44,14 @@ ulong bootcount_load(void)
 		return 0;
 	}
 
-	ret = fs_read(CONFIG_SYS_BOOTCOUNT_EXT_NAME, CONFIG_SYS_BOOTCOUNT_ADDR,
-		      0, 2, &len_read);
+	buf = map_sysmem(CONFIG_SYS_BOOTCOUNT_ADDR, 2);
+
+	ret = fs_read(CONFIG_SYS_BOOTCOUNT_EXT_NAME, buf, 0, 2, &len_read);
 	if (ret != 0 || len_read != 2) {
 		puts("Error loading bootcount\n");
 		return 0;
 	}
 
-	buf = map_sysmem(CONFIG_SYS_BOOTCOUNT_ADDR, 2);
 	if (buf[0] == BC_MAGIC)
 		ret = buf[1];
 

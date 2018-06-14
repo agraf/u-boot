@@ -76,27 +76,27 @@ int fs_size(const char *filename, loff_t *size);
  * Note that not all filesystem types support either/both offset!=0 or len!=0.
  *
  * @filename: Name of file to read from
- * @addr: The address to read into
+ * @buf: The buffer to read into
  * @offset: The offset in file to read from
  * @len: The number of bytes to read. Maybe 0 to read entire file
  * @actread: Returns the actual number of bytes read
  * @return 0 if ok with valid *actread, -1 on error conditions
  */
-int fs_read(const char *filename, ulong addr, loff_t offset, loff_t len,
+int fs_read(const char *filename, void *buf, loff_t offset, loff_t len,
 	    loff_t *actread);
 
 /*
  * fs_write - Write file to the partition previously set by fs_set_blk_dev()
  * Note that not all filesystem types support offset!=0.
  *
- * @filename: Name of file to read from
- * @addr: The address to read into
- * @offset: The offset in file to read from. Maybe 0 to write to start of file
+ * @filename: Name of file to write to
+ * @buf: The buffer to read from
+ * @offset: The offset in file to write to. Maybe 0 to write to start of file
  * @len: The number of bytes to write
  * @actwrite: Returns the actual number of bytes written
  * @return 0 if ok with valid *actwrite, -1 on error conditions
  */
-int fs_write(const char *filename, ulong addr, loff_t offset, loff_t len,
+int fs_write(const char *filename, void *buf, loff_t offset, loff_t len,
 	     loff_t *actwrite);
 
 /*

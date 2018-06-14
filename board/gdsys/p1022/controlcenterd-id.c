@@ -874,7 +874,7 @@ static struct key_program *load_key_chunk(const char *ifname,
 
 	if (fs_set_blk_dev(ifname, dev_part_str, fs_type))
 		goto failure;
-	if (fs_read(path, (ulong)buf, 0, 12, &i) < 0)
+	if (fs_read(path, buf, 0, 12, &i) < 0)
 		goto failure;
 	if (i < 12)
 		goto failure;
@@ -890,7 +890,7 @@ static struct key_program *load_key_chunk(const char *ifname,
 		goto failure;
 	if (fs_set_blk_dev(ifname, dev_part_str, fs_type))
 		goto failure;
-	if (fs_read(path, (ulong)result, 0,
+	if (fs_read(path, result, 0,
 		    sizeof(struct key_program) + header.code_size, &i) < 0)
 		goto failure;
 	if (i <= 0)
@@ -1019,7 +1019,7 @@ static int second_stage_init(void)
 	struct key_program *hmac_blob = NULL;
 	const char *image_path = "/ccdm.itb";
 	char *mac_path = NULL;
-	ulong image_addr;
+	u8 *image_addr;
 	loff_t image_size;
 	uint32_t err;
 
@@ -1059,7 +1059,7 @@ static int second_stage_init(void)
 	strcat(mac_path, mac_suffix);
 
 	/* read image from mmcdev (ccdm.itb) */
-	image_addr = (ulong)get_image_location();
+	image_addr = get_image_location();
 	if (fs_set_blk_dev("mmc", mmcdev, FS_TYPE_EXT))
 		goto failure;
 	if (fs_read(image_path, image_addr, 0, 0, &image_size) < 0)
@@ -1077,7 +1077,7 @@ static int second_stage_init(void)
 		puts("corrupted mac file\n");
 		goto failure;
 	}
-	if (check_hmac(hmac_blob, (u8 *)image_addr, image_size)) {
+	if (check_hmac(hmac_blob, image_addr, image_size)) {
 		puts("image integrity could not be verified\n");
 		goto failure;
 	}
