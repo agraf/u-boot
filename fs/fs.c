@@ -402,20 +402,17 @@ int fs_size(const char *filename, loff_t *size)
 	return ret;
 }
 
-int fs_read(const char *filename, ulong addr, loff_t offset, loff_t len,
+int fs_read(const char *filename, void *buf, loff_t offset, loff_t len,
 	    loff_t *actread)
 {
 	struct fstype_info *info = fs_get_info(fs_type);
-	void *buf;
 	int ret;
 
 	/*
 	 * We don't actually know how many bytes are being read, since len==0
 	 * means read the whole file.
 	 */
-	buf = map_sysmem(addr, len);
 	ret = info->read(filename, buf, offset, len, actread);
-	unmap_sysmem(buf);
 
 	/* If we requested a specific number of bytes, check we got it */
 	if (ret == 0 && len && *actread != len)
@@ -425,16 +422,13 @@ int fs_read(const char *filename, ulong addr, loff_t offset, loff_t len,
 	return ret;
 }
 
-int fs_write(const char *filename, ulong addr, loff_t offset, loff_t len,
+int fs_write(const char *filename, void *buf, loff_t offset, loff_t len,
 	     loff_t *actwrite)
 {
 	struct fstype_info *info = fs_get_info(fs_type);
-	void *buf;
 	int ret;
 
-	buf = map_sysmem(addr, len);
 	ret = info->write(filename, buf, offset, len, actwrite);
-	unmap_sysmem(buf);
 
 	if (ret < 0 && len != *actwrite) {
 		printf("** Unable to write file %s **\n", filename);
@@ -529,6 +523,7 @@ int do_load(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 	int ret;
 	unsigned long time;
 	char *ep;
+	void *buf;
 
 	if (argc < 2)
 		return CMD_RET_USAGE;
@@ -567,9 +562,11 @@ int do_load(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 	else
 		pos = 0;
 
+	buf = map_sysmem(addr, bytes);
 	time = get_timer(0);
-	ret = fs_read(filename, addr, pos, bytes, &len_read);
+	ret = fs_read(filename, buf, pos, bytes, &len_read);
 	time = get_timer(time);
+	unmap_sysmem(buf);
 	if (ret < 0)
 		return 1;
 
@@ -623,6 +620,7 @@ int do_save(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 	loff_t len;
 	int ret;
 	unsigned long time;
+	void *buf;
 
 	if (argc < 6 || argc > 7)
 		return CMD_RET_USAGE;
@@ -638,9 +636,11 @@ int do_save(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 	else
 		pos = 0;
 
+	buf = map_sysmem(addr, bytes);
 	time = get_timer(0);
-	ret = fs_write(filename, addr, pos, bytes, &len);
+	ret = fs_write(filename, buf, pos, bytes, &len);
 	time = get_timer(time);
+	unmap_sysmem(buf);
 	if (ret < 0)
 		return 1;
 

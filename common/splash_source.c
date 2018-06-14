@@ -11,6 +11,7 @@
 #include <fs.h>
 #include <fdt_support.h>
 #include <image.h>
+#include <mapmem.h>
 #include <nand.h>
 #include <sata.h>
 #include <spi.h>
@@ -252,7 +253,8 @@ static int splash_load_fs(struct splash_location *location, u32 bmp_load_addr)
 	}
 
 	splash_select_fs_dev(location);
-	res = fs_read(splash_file, bmp_load_addr, 0, 0, &actread);
+	res = fs_read(splash_file, map_sysmem(bmp_load_addr, bmp_size),
+		      0, 0, &actread);
 
 out:
 	if (location->ubivol != NULL)

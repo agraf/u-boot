@@ -269,7 +269,7 @@ static int load_devicetree(void)
 		puts("load_devicetree: set_blk_dev failed.\n");
 		return -1;
 	}
-	rc = fs_read(dtbname, (u32)dtbaddr, 0, 0, &dtbsize);
+	rc = fs_read(dtbname, (u_char *)dtbaddr, 0, 0, &dtbsize);
 #endif
 	if (rc == 0) {
 		gd->fdt_blob = (void *)dtbaddr;
