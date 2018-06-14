@@ -5,6 +5,7 @@
 #define DEBUG
 #include <common.h>
 #include <dm.h>
+#include <efi_loader.h>
 #include <errno.h>
 #include <linux/libfdt.h>
 #include <os.h>
@@ -176,4 +177,19 @@ void longjmp(jmp_buf jmp, int ret)
 	os_longjmp((ulong *)jmp, ret);
 	while (1)
 		;
+}
+
+/*
+ * In sandbox, we don't have a 1:1 map, so we need to expose
+ * process addresses instead of U-Boot addresses
+ */
+void efi_add_known_memory(void)
+{
+	u64 ram_start = (uintptr_t)map_sysmem(0, gd->ram_size);
+	u64 ram_size = gd->ram_size;
+	u64 start = (ram_start + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
+	u64 pages = (ram_size + EFI_PAGE_MASK) >> EFI_PAGE_SHIFT;
+
+	efi_add_memory_map(start, pages, EFI_CONVENTIONAL_MEMORY,
+			   false);
 }
