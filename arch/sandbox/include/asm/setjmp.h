@@ -24,7 +24,9 @@ struct jmp_buf_data {
 
 typedef struct jmp_buf_data jmp_buf[1];
 
-int setjmp(jmp_buf jmp);
+/* Call the OS setjmp function directly, so that we don't introduce returns */
+#define setjmp _setjmp
+int _setjmp(jmp_buf jmp);
 __noreturn void longjmp(jmp_buf jmp, int ret);
 
 #endif /* _SETJMP_H_ */
