@@ -263,6 +263,9 @@
 #elif defined(__riscv) && (__riscv_xlen == 64)
 #define BOOTENV_EFI_PXE_ARCH "0x1b"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00027:UNDI:003000"
+#elif defined(__ASSEMBLY__)
+#define BOOTENV_EFI_PXE_ARCH "0xff"
+#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00255:UNDI:003000"
 #else
 #error Please specify an EFI client identifier
 #endif
