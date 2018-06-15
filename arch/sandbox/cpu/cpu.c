@@ -162,3 +162,13 @@ void longjmp(jmp_buf jmp, int ret)
 	while (1)
 		;
 }
+
+void allow_unaligned(void)
+{
+	int r;
+
+	r = os_mprotect(gd->arch.ram_buf, gd->ram_size,
+			OS_PROT_READ | OS_PROT_WRITE | OS_PROT_EXEC);
+
+	assert(!r);
+}

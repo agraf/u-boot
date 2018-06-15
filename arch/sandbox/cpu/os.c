@@ -183,6 +183,29 @@ void *os_realloc(void *ptr, size_t length)
 	return buf;
 }
 
+int os_mprotect(void *ptr, size_t length, int prot)
+{
+	struct os_mem_hdr *hdr = ptr;
+	int p = 0;
+
+	if ((uintptr_t)ptr & sizeof(*hdr)) {
+		/*
+		 * We got an unaligned pointer, probably a return value
+		 * from os_malloc()
+		 */
+		ptr = &hdr[-1];
+	}
+
+	if (prot & OS_PROT_READ)
+		p |= PROT_READ;
+	if (prot & OS_PROT_WRITE)
+		p |= PROT_WRITE;
+	if (prot & OS_PROT_EXEC)
+		p |= PROT_EXEC;
+
+	return mprotect(ptr, length, p);
+}
+
 void os_usleep(unsigned long usec)
 {
 	usleep(usec);
