@@ -157,6 +157,25 @@ void os_free(void *ptr);
 void *os_realloc(void *ptr, size_t length);
 
 /**
+ * Modify protection of a memory region
+ *
+ * This function changes the memory protection scheme of a given memory
+ * region. Using it you can for example allow execution of memory that
+ * would otherwise prohibit it.
+ *
+ * \param ptr		Pointer to memory region to modify
+ * \param length	New length for memory block
+ * \param prot		New protection scheme (ORed OS_PROT_ values)
+ * \return 0 on success, -1 otherwise.
+ */
+int os_mprotect(void *ptr, size_t length, int prot);
+
+/* Defines for "prot" in os_mprotect() */
+#define OS_PROT_READ	0x1
+#define OS_PROT_WRITE	0x2
+#define OS_PROT_EXEC	0x4
+
+/**
  * Access to the usleep function of the os
  *
  * \param usec Time to sleep in micro seconds

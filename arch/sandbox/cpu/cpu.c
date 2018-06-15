@@ -192,3 +192,17 @@ void efi_add_known_memory(void)
 }
 
 #endif
+
+#if CONFIG_IS_ENABLED(EFI_LOADER)
+
+void allow_unaligned(void)
+{
+	int r;
+
+	r = os_mprotect(gd->arch.ram_buf, gd->ram_size,
+			OS_PROT_READ | OS_PROT_WRITE | OS_PROT_EXEC);
+
+	assert(!r);
+}
+
+#endif

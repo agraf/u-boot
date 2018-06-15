@@ -183,6 +183,20 @@ void *os_realloc(void *ptr, size_t length)
 	return buf;
 }
 
+int os_mprotect(void *ptr, size_t length, int prot)
+{
+	int p = 0;
+
+	if (prot & OS_PROT_READ)
+		p |= PROT_READ;
+	if (prot & OS_PROT_WRITE)
+		p |= PROT_WRITE;
+	if (prot & OS_PROT_EXEC)
+		p |= PROT_EXEC;
+
+	return mprotect(ptr, length, p);
+}
+
 void os_usleep(unsigned long usec)
 {
 	usleep(usec);
