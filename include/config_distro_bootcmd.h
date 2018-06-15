@@ -245,35 +245,24 @@
 #if defined(CONFIG_CMD_DHCP)
 #if defined(CONFIG_EFI_LOADER)
 /* http://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xml */
-#if defined(CONFIG_ARM64)
+#if defined(__aarch64__)
 #define BOOTENV_EFI_PXE_ARCH "0xb"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00011:UNDI:003000"
-#elif defined(CONFIG_ARM)
+#elif defined(__arm__)
 #define BOOTENV_EFI_PXE_ARCH "0xa"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00010:UNDI:003000"
-
-/* For sandbox we only support 64-bit x86 at present */
-#elif defined(CONFIG_X86)
-/* Always assume we're running 64bit */
+#elif defined(__x86_64__)
 #define BOOTENV_EFI_PXE_ARCH "0x7"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00007:UNDI:003000"
-#elif defined(CONFIG_CPU_RISCV_32)
+#elif defined(__i386__)
+#define BOOTENV_EFI_PXE_ARCH "0x0"
+#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00000:UNDI:003000"
+#elif defined(__riscv) && (__riscv_xlen == 32)
 #define BOOTENV_EFI_PXE_ARCH "0x19"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00025:UNDI:003000"
-#elif defined(CONFIG_CPU_RISCV_64)
+#elif defined(__riscv) && (__riscv_xlen == 64)
 #define BOOTENV_EFI_PXE_ARCH "0x1b"
 #define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00027:UNDI:003000"
-#elif defined(CONFIG_SANDBOX)
-/*
- * TODO(sjg@chromium.org): Consider providing a way to enable sandbox features
- * based on the host architecture
- */
-# ifndef __x86_64__
-#  warning "sandbox EFI support is only tested on 64-bit x86"
-# endif
-/* To support other *host* architectures this should be changed */
-#define BOOTENV_EFI_PXE_ARCH "0x7"
-#define BOOTENV_EFI_PXE_VCI "PXEClient:Arch:00007:UNDI:003000"
 #else
 #error Please specify an EFI client identifier
 #endif
