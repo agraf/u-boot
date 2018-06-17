@@ -366,6 +366,9 @@ int state_init(void)
 {
 	state = &main_state;
 
+	/* Make sure we allow read&write only on RAM */
+	assert(!os_mprotect(sandbox_ram, CONFIG_SYS_SDRAM_SIZE,
+			    OS_PROT_READ | OS_PROT_WRITE));
 	state->ram_size = CONFIG_SYS_SDRAM_SIZE;
 	state->ram_buf = sandbox_ram;
 
