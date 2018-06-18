@@ -631,3 +631,8 @@ void os_localtime(struct rtc_time *rt)
 	rt->tm_yday = tm->tm_yday;
 	rt->tm_isdst = tm->tm_isdst;
 }
+
+void os_abort(void)
+{
+	abort();
+}

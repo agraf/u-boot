@@ -330,4 +330,9 @@ int os_spl_to_uboot(const char *fname);
  */
 void os_localtime(struct rtc_time *rt);
 
+/**
+ * os_abort() - Raise SIGABRT to exit sandbox (e.g. to debugger)
+ */
+void os_abort(void);
+
 #endif
