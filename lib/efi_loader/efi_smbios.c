@@ -8,6 +8,7 @@
 #include <common.h>
 #include <efi_loader.h>
 #include <inttypes.h>
+#include <mapmem.h>
 #include <smbios.h>
 
 static const efi_guid_t smbios_guid = SMBIOS_TABLE_GUID;
@@ -21,6 +22,8 @@ efi_status_t efi_smbios_register(void)
 {
 	/* Map within the low 32 bits, to allow for 32bit SMBIOS tables */
 	u64 dmi = U32_MAX;
+	u64 dmi_addr;
+	void *dmi_ptr;
 	efi_status_t ret;
 
 	/* Reserve 4kiB page for SMBIOS */
@@ -37,14 +40,21 @@ efi_status_t efi_smbios_register(void)
 	}
 
 	/*
+	 * efi_allocate_pages() returns the allocated pointer in dmi,
+	 * which we need to convert back into a U-Boot address for
+	 * write_smbios_table()
+	 */
+	dmi_ptr = (void *)(uintptr_t)dmi;
+	dmi_addr = map_to_sysmem(dmi_ptr);
+
+	/*
 	 * Generate SMBIOS tables - we know that efi_allocate_pages() returns
 	 * a 4k-aligned address, so it is safe to assume that
 	 * write_smbios_table() will write the table at that address.
 	 */
-	assert(!(dmi & 0xf));
-	write_smbios_table(dmi);
+	assert(!(dmi_addr & 0xf));
+	write_smbios_table(dmi_addr);
 
 	/* And expose them to our EFI payload */
-	return efi_install_configuration_table(&smbios_guid,
-					       (void *)(uintptr_t)dmi);
+	return efi_install_configuration_table(&smbios_guid, dmi_ptr);
 }
