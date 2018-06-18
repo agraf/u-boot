@@ -143,14 +143,15 @@ void os_tty_raw(int fd, bool allow_sigs)
 void *os_malloc(size_t length)
 {
 	struct os_mem_hdr *hdr;
+	size_t alloc_length = length + (64 * 1024);
 
-	hdr = mmap(NULL, length + sizeof(*hdr), PROT_READ | PROT_WRITE,
+	hdr = mmap(NULL, alloc_length, PROT_READ | PROT_WRITE,
 		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (hdr == MAP_FAILED)
 		return NULL;
 	hdr->length = length;
 
-	return hdr + 1;
+	return (void*)hdr + (64 * 1024);
 }
 
 void os_free(void *ptr)
