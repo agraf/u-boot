@@ -118,6 +118,7 @@
 #include "wol.h"
 #endif
 #include <net/tcp.h>
+#include <net/wget.h>
 
 /** BOOTP EXTENTIONS **/
 
@@ -499,6 +500,11 @@ restart:
 #if defined(CONFIG_CMD_NFS)
 		case NFS:
 			nfs_start();
+			break;
+#endif
+#if defined(CONFIG_CMD_WGET)
+		case WGET:
+			wget_start();
 			break;
 #endif
 #if defined(CONFIG_CMD_CDP)
@@ -1591,7 +1597,8 @@ int net_parse_bootfile(struct in_addr *ipaddr, char *filename, int max_len)
 
 #if	defined(CONFIG_CMD_NFS)		|| \
 	defined(CONFIG_CMD_SNTP)	|| \
-	defined(CONFIG_CMD_DNS)
+	defined(CONFIG_CMD_DNS)		|| \
+	defined(CONFIG_CMD_WGET)
 /*
  * make port a little random (1024-17407)
  * This keeps the math somewhat trivial to compute, and seems to work with
