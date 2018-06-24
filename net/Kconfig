@@ -35,4 +35,10 @@ config TFTP_BLOCKSIZE
 	help
 	  Default TFTP block size.
 
+config TCP
+	bool "TCP stack"
+	help
+	  TCP protocol support with SACK for wget. Selecting this will provide
+	  the fastest file transfer possible.
+
 endif   # if NET

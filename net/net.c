@@ -117,6 +117,7 @@
 #if defined(CONFIG_CMD_WOL)
 #include "wol.h"
 #endif
+#include <net/tcp.h>
 
 /** BOOTP EXTENTIONS **/
 
@@ -387,6 +388,9 @@ void net_init(void)
 
 		/* Only need to setup buffer pointers once. */
 		first_call = 0;
+#if defined(CONFIG_TCP)
+		tcp_set_tcp_state(TCP_CLOSED);
+#endif
 	}
 
 	net_init_loop();
@@ -811,6 +815,16 @@ int net_send_udp_packet(uchar *ether, struct in_addr dest, int dport, int sport,
 				  IPPROTO_UDP, 0, 0, 0);
 }
 
+#if defined(CONFIG_TCP)
+int net_send_tcp_packet(int payload_len, int dport, int sport, u8 action,
+			u32 tcp_seq_num, u32 tcp_ack_num)
+{
+	return net_send_ip_packet(net_server_ethaddr, net_server_ip, dport,
+				  sport, payload_len, IPPROTO_TCP, action,
+				  tcp_seq_num, tcp_ack_num);
+}
+#endif
+
 int net_send_ip_packet(uchar *ether, struct in_addr dest, int dport, int sport,
 		       int payload_len, int proto, u8 action, u32 tcp_seq_num,
 		       u32 tcp_ack_num)
@@ -842,6 +856,15 @@ int net_send_ip_packet(uchar *ether, struct in_addr dest, int dport, int sport,
 				   payload_len);
 		pkt_hdr_size = eth_hdr_size + IP_UDP_HDR_SIZE;
 		break;
+#if defined(CONFIG_TCP)
+	case IPPROTO_TCP:
+		pkt_hdr_size = eth_hdr_size +
+		tcp_set_tcp_header(pkt + eth_hdr_size, dport, sport,
+				   payload_len, action, tcp_seq_num,
+				   tcp_ack_num);
+	break;
+#endif
+
 	default:
 		return -EINVAL;
 	}
@@ -1248,6 +1271,16 @@ void net_process_received_packet(uchar *in_packet, int len)
 		if (ip->ip_p == IPPROTO_ICMP) {
 			receive_icmp(ip, len, src_ip, et);
 			return;
+#if defined(CONFIG_TCP)
+		} else if (ip->ip_p == IPPROTO_TCP) {
+			debug_cond(DEBUG_DEV_PKT,
+				   "TCP PH (to=%pI4, from=%pI4, len=%d)\n",
+				   &dst_ip, &src_ip, len);
+
+			rxhand_tcp_f((union tcp_build_pkt *)ip, len);
+			return;
+#endif
+
 		} else if (ip->ip_p != IPPROTO_UDP) {	/* Only UDP packets */
 			return;
 		}

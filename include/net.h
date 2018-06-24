@@ -27,6 +27,9 @@
  *
  */
 
+#if defined(CONFIG_TCP)		/* Protected UDP uses less bufferes than TCP */
+#define CONFIG_SYS_RX_ETH_BUFFER 12
+#endif
 #ifdef CONFIG_SYS_RX_ETH_BUFFER
 # define PKTBUFSRX	CONFIG_SYS_RX_ETH_BUFFER
 #else
@@ -345,6 +348,7 @@ struct vlan_ethernet_hdr {
 #define PROT_PPP_SES	0x8864		/* PPPoE session messages	*/
 
 #define IPPROTO_ICMP	 1	/* Internet Control Message Protocol	*/
+#define IPPROTO_TCP	 6	/* Transmission Control Protocol	*/
 #define IPPROTO_UDP	17	/* User Datagram Protocol		*/
 
 /*
@@ -661,7 +665,7 @@ static inline void net_send_packet(uchar *pkt, int len)
 }
 
 /*
- * Transmit "net_tx_packet" as UDP packet, performing ARP request if needed
+ * Transmit "net_tx_packet" as UDP or TCPpacket, send ARP request if needed
  *  (ether will be populated)
  *
  * @param ether Raw packet buffer
@@ -669,10 +673,15 @@ static inline void net_send_packet(uchar *pkt, int len)
  * @param dport Destination UDP port
  * @param sport Source UDP port
  * @param payload_len Length of data after the UDP header
+ * @param action TCP action to be performed
+ * @param tcp_seq_num TCP sequence number of this transmission
+ * @param tcp_ack_num TCP stream acknolegement number
  */
 int net_send_ip_packet(uchar *ether, struct in_addr dest, int dport, int sport,
 		       int payload_len, int proto, u8 action, u32 tcp_seq_num,
 		       u32 tcp_ack_num);
+int net_send_tcp_packet(int payload_len, int dport, int sport, u8 action,
+			u32 tcp_seq_num, u32 tcp_ack_num);
 int net_send_udp_packet(uchar *ether, struct in_addr dest, int dport,
 			int sport, int payload_len);
 
