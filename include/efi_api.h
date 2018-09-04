@@ -851,7 +851,7 @@ static inline struct efi_hii_string_block *efi_hii_sibt_string_ucs2_block_next(
 	struct efi_hii_sibt_string_ucs2_block *blk)
 {
 	return ((void *)blk) + sizeof(*blk) +
-		(utf16_utf8_strlen(blk->string_text) + 1);
+		((u16_strlen(blk->string_text) + 1) * 2);
 }
 
 typedef void *efi_hii_handle_t;
