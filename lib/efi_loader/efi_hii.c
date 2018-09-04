@@ -115,10 +115,12 @@ static efi_status_t add_strings_package(struct hii_package *hii,
 		case EFI_HII_SIBT_STRING_UCS2: {
 			struct efi_hii_sibt_string_ucs2_block *ucs2 =
 				(void *)block;
+			int len = (u16_strlen(ucs2->string_text) + 1) * 2;
+
+			debug("%4u: \"%ls\"\n", id + 1, ucs2->string_text);
+			stbl->strings[id].string = malloc(len);
+			memcpy(stbl->strings[id].string, ucs2->string_text, len);
 			id++;
-			debug("%4u: \"%ls\"\n", id, ucs2->string_text);
-			stbl->strings[id-1].string =
-				utf16_strdup(ucs2->string_text);
 			block = efi_hii_sibt_string_ucs2_block_next(ucs2);
 			break;
 		}
@@ -402,7 +404,7 @@ static efi_status_t EFIAPI get_string(
 			if (idx > stbl->nstrings)
 				return EFI_EXIT(EFI_NOT_FOUND);
 			efi_string_t str = stbl->strings[idx].string;
-			size_t len = utf16_strlen(str) + 1;
+			size_t len = u16_strlen(str) + 1;
 			if (*string_size < len * 2) {
 				*string_size = len * 2;
 				return EFI_EXIT(EFI_BUFFER_TOO_SMALL);
