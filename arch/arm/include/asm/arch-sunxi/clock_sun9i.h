@@ -194,6 +194,7 @@ struct sunxi_ccm_reg {
 
 /* ahb gate1 field */
 #define AHB_GATE_OFFSET_DMA		24
+#define AHB_GATE_OFFSET_SPI0		20
 
 /* apb1_gate fields */
 #define APB1_GATE_UART_SHIFT		16
