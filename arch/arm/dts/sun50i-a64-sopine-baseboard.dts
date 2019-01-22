@@ -46,6 +46,7 @@
 /dts-v1/;
 
 #include "sun50i-a64-sopine.dtsi"
+#include "sun50i-a64-sopine-baseboard-u-boot.dtsi"
 
 / {
 	model = "SoPine with baseboard";
