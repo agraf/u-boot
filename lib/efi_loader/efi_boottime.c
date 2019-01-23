@@ -1917,6 +1917,7 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
 	bootm_disable_interrupts();
 
 	/* Disable boot time services */
+	efi_runtime_detach((ulong)gd->relocaddr);
 	systab.con_in_handle = NULL;
 	systab.con_in = NULL;
 	systab.con_out_handle = NULL;

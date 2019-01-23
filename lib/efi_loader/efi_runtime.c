@@ -276,15 +276,11 @@ struct efi_runtime_detach_list_struct {
 	void *patchto;
 };
 
-static const struct efi_runtime_detach_list_struct efi_runtime_detach_list[] = {
+static struct efi_runtime_detach_list_struct efi_runtime_detach_list[] = {
 	{
 		/* do_reset is gone */
 		.ptr = &efi_runtime_services.reset_system,
 		.patchto = efi_reset_system,
-	}, {
-		/* invalidate_*cache_all are gone */
-		.ptr = &efi_runtime_services.set_virtual_address_map,
-		.patchto = &efi_unimplemented,
 	}, {
 		/* RTC accessors are gone */
 		.ptr = &efi_runtime_services.get_time,
@@ -328,7 +324,15 @@ static bool efi_runtime_tobedetached(void *p)
 	return false;
 }
 
-static void efi_runtime_detach(ulong offset)
+/**
+ * efi_runtime_detach() - Remove any dependency on non-runtime sections
+ *
+ * This function patches all remaining code to be self-sufficient inside
+ * runtime sections. Any calls to non-runtime will be removed after this.
+ *
+ * @offset:		relocaddr for pre-set_v_a_space, offset to VA after
+ */
+__efi_runtime void efi_runtime_detach(ulong offset)
 {
 	int i;
 	ulong patchoff = offset - (ulong)gd->relocaddr;
@@ -344,6 +348,8 @@ static void efi_runtime_detach(ulong offset)
 
 	/* Update CRC32 */
 	efi_update_table_header_crc32(&efi_runtime_services.hdr);
+
+        invalidate_icache_all();
 }
 
 /* Relocate EFI runtime to uboot_reloc_base = offset */
@@ -430,18 +436,24 @@ void efi_runtime_relocate(ulong offset, struct efi_mem_desc *map)
  * @virtmap:		virtual address mapping information
  * Return:		status code
  */
-static efi_status_t EFIAPI efi_set_virtual_address_map(
+static __efi_runtime efi_status_t EFIAPI efi_set_virtual_address_map(
 			unsigned long memory_map_size,
 			unsigned long descriptor_size,
 			uint32_t descriptor_version,
 			struct efi_mem_desc *virtmap)
 {
+	static __efi_runtime_data bool is_patched;
 	int n = memory_map_size / descriptor_size;
 	int i;
 	int rt_code_sections = 0;
 
+	if (is_patched)
+		return EFI_INVALID_PARAMETER;
+
 	EFI_ENTRY("%lx %lx %x %p", memory_map_size, descriptor_size,
 		  descriptor_version, virtmap);
+
+	is_patched = true;
 
 	/*
 	 * TODO:
@@ -514,8 +526,7 @@ static efi_status_t EFIAPI efi_set_virtual_address_map(
 					   map->physical_start + gd->relocaddr;
 
 			efi_runtime_relocate(new_offset, map);
-			/* Once we're virtual, we can no longer handle
-			   complex callbacks */
+			/* We need to repatch callbacks for their new VA */
 			efi_runtime_detach(new_offset);
 			return EFI_EXIT(EFI_SUCCESS);
 		}

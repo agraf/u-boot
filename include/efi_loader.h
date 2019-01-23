@@ -310,6 +310,8 @@ void efi_save_gd(void);
 void efi_restore_gd(void);
 /* Call this to relocate the runtime section to an address space */
 void efi_runtime_relocate(ulong offset, struct efi_mem_desc *map);
+/* Call this when we start to live in a runtime only world */
+void efi_runtime_detach(ulong offset);
 /* Call this to set the current device name */
 void efi_set_bootdev(const char *dev, const char *devnr, const char *path);
 /* Add a new object to the object list. */
