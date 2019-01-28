@@ -10,6 +10,29 @@
 #include <sysreset.h>
 #include <asm/io.h>
 #include <asm/processor.h>
+#include <efi_loader.h>
+
+#ifdef CONFIG_EFI_LOADER
+void __efi_runtime EFIAPI efi_reset_system(
+			enum efi_reset_type reset_type,
+			efi_status_t reset_status,
+			unsigned long data_size, void *reset_data)
+{
+	u32 value = 0;
+
+	if (reset_type == EFI_RESET_COLD)
+		value = SYS_RST | RST_CPU | FULL_RST;
+	else if (reset_type == EFI_RESET_WARM)
+		value = SYS_RST | RST_CPU;
+
+	/* TODO EFI_RESET_PLATFORM_SPECIFIC and EFI_RESET_SHUTDOWN */
+
+	if (value)
+		outb(value, IO_PORT_RESET);
+
+	while (1) { }
+}
+#endif
 
 static int x86_sysreset_request(struct udevice *dev, enum sysreset_t type)
 {
